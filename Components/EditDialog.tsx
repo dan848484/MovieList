@@ -7,10 +7,10 @@ import {
 } from "@mui/material";
 import { createTheme } from "@mui/system";
 import React, { ChangeEvent, useState } from "react";
-import { useAppDispatch, useAppSelector } from "../hooks";
-import { Movie } from "../Movie.model";
-import { edit } from "../Slices/movieSlice";
-import { setMovie, open, close } from "../Slices/dialogSlice";
+import { useAppDispatch, useAppSelector } from "../redux/hooks";
+import { Movie } from "../pages/Movie.model";
+import { edit } from "../redux/Slices/movieSlice";
+import { setMovie, open, close } from "../redux/Slices/dialogSlice";
 
 export const EditDialog = () => {
   const [name, setName] = useState("");

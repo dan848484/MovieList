@@ -1,6 +1,6 @@
 import { createSlice, nanoid, PayloadAction } from "@reduxjs/toolkit";
 import type { RootState } from "../store";
-import { Movie } from "../Movie.model";
+import { Movie } from "../../pages/Movie.model";
 
 interface MovieState {
   movies: Movie[];

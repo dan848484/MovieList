@@ -1,12 +1,12 @@
 import type { NextPage } from "next";
 import React, { useState } from "react";
-import { useAppDispatch, useAppSelector } from "./hooks";
-import { add } from "./Slices/movieSlice";
-import { ListElement } from "./Components/ListElement";
+import { useAppDispatch, useAppSelector } from "../redux/hooks";
+import { add } from "../redux/Slices/movieSlice";
+import { ListElement } from "../Components/ListElement";
 import { createTheme, IconButton } from "@mui/material";
-import { AddButton } from "./Components/AddButton";
-import { AddDialog } from "./Components/AddDialog";
-import { EditDialog } from "./Components/EditDialog";
+import { AddButton } from "../Components/AddButton";
+import { AddDialog } from "../Components/AddDialog";
+import { EditDialog } from "../Components/EditDialog";
 
 const Home: NextPage = () => {
   const movies = useAppSelector((state) => state.movies);

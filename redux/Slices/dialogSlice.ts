@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { Movie } from "../Movie.model";
+import { Movie } from "../../pages/Movie.model";
 
 type Kinds = "edit";
 

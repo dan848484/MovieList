@@ -1,8 +1,8 @@
 import { createTheme, width } from "@mui/system";
 import React, { useState } from "react";
-import { useAppDispatch, useAppSelector } from "../hooks";
-import { Movie } from "../Movie.model";
-import { remove, mark, unmark } from "../Slices/movieSlice";
+import { useAppDispatch, useAppSelector } from "../redux/hooks";
+import { Movie } from "../pages/Movie.model";
+import { remove, mark, unmark } from "../redux/Slices/movieSlice";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import {
   Button,
@@ -13,7 +13,7 @@ import {
 } from "@mui/material";
 import RemoveCircleOutlineIcon from "@mui/icons-material/RemoveCircleOutline";
 import EditIcon from "@mui/icons-material/Edit";
-import { setMovie, open, close } from "../Slices/dialogSlice";
+import { setMovie, open, close } from "../redux/Slices/dialogSlice";
 
 interface Props {
   movie: Movie;
