@@ -4,22 +4,38 @@ import { Provider } from "react-redux";
 import { Auth } from "../auth/Auth";
 import { store } from "../redux/store";
 import "../styles/globals.css";
+import { LoginForm } from "../Components/LoginForm";
 
 function MyApp({ Component, pageProps }: AppProps) {
+  const [loginRequired, setLoginRequired] = React.useState(true);
+  const [auth] = React.useState(new Auth());
+
+  /**
+   * ログイン成功時に実行する関数
+   */
+  const handleFormComplete = () => {
+    setLoginRequired(false);
+  };
+
   useEffect(() => {
-    let auth = new Auth();
-    if (auth.getUserInfo()?.session.isValid()) {
-      console.log("ログイン状態です。");
-    } else {
-      console.log("ログインされていない状態です");
-      auth.login("tom", "Tomdan8464!");
-    }
+    (async () => {
+      try {
+        const session = await auth.isLogined();
+        console.log(session);
+        setLoginRequired(false);
+      } catch (error) {
+        console.log(
+          "ログインが完了していません。ログインフォームに遷移します。"
+        );
+      }
+    })();
   }, []);
-  return (
-    <Provider store={store}>
-      <Component {...pageProps} />
-    </Provider>
+  const content = loginRequired ? (
+    <LoginForm onComplete={handleFormComplete} auth={auth}></LoginForm>
+  ) : (
+    <Component {...pageProps} />
   );
+  return <Provider store={store}>{content}</Provider>;
 }
 
 export default MyApp;

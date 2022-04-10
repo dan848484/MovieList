@@ -13,6 +13,7 @@
     "@emotion/react": "^11.7.1",
     "@emotion/styled": "^11.6.0",
     "@mui/icons-material": "^5.2.5",
+    "@mui/lab": "^5.0.0-alpha.76",
     "@mui/material": "^5.2.6",
     "@reduxjs/toolkit": "^1.7.1",
     "amazon-cognito-identity-js": "^5.2.8",
@@ -20,8 +21,10 @@
     "next": "12.1.0",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
+    "react-hook-form": "^7.29.0",
     "react-redux": "^7.2.6",
-    "react-router": "^6.2.1"
+    "react-router": "^6.2.1",
+    "rxjs": "^7.5.5"
   },
   "devDependencies": {
     "@types/node": "17.0.18",
