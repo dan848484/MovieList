@@ -8,15 +8,29 @@ import {
 } from "amazon-cognito-identity-js";
 import { CognitoIdentityCredentials, config } from "aws-sdk";
 
+type UserAttributes = { email: string; name: string };
+
 export class Auth {
-  private userPool: CognitoUserPool;
-  private poolData: ICognitoUserPoolData;
-  constructor() {
+  private userPool: CognitoUserPool | null = null;
+  private poolData: ICognitoUserPoolData | null = null;
+  private _isSetUp = false;
+  constructor() {}
+
+  get isSetUp() {
+    return this._isSetUp;
+  }
+
+  async setUpAuth() {
+    const userpoolIds = await (await fetch("/api/userpool")).json();
     this.poolData = {
-      UserPoolId: "ap-northeast-1_eSVsdBM5q",
-      ClientId: "5bosqe5a0lq8ctj36i41hkbj1n",
+      UserPoolId: userpoolIds.pool_id,
+      ClientId: userpoolIds.client_id,
     };
+
+    console.log(this.poolData);
+
     this.userPool = new CognitoUserPool(this.poolData);
+    this._isSetUp = true;
   }
 
   /**
@@ -26,6 +40,10 @@ export class Auth {
    */
   async login(name: string, password: string): Promise<CognitoUserSession> {
     const promise = new Promise<CognitoUserSession>((resolve, reject) => {
+      if (!this.isSetUp) {
+        reject(new AuthIsNotSetUpError());
+        return;
+      }
       let authenticationData = {
         Username: name,
         Password: password,
@@ -35,21 +53,24 @@ export class Auth {
 
       let userData = {
         Username: name,
-        Pool: this.userPool,
+        Pool: this.userPool!,
       };
 
       let cognitoUser = new CognitoUser(userData);
 
       const callbacks = {
-        onSuccess: (result) => {
+        onSuccess: (result: CognitoUserSession) => {
           console.log("ログイン成功", result);
           resolve(result);
         },
-        onFailure: (result) => {
+        onFailure: (result: any) => {
           console.log("ログイン失敗", result);
           reject(new Error(result));
         },
-        newPasswordRequired: (userAttributes, requiredAttributes) => {
+        newPasswordRequired: (
+          userAttributes: UserAttributes,
+          requiredAttributes: any
+        ) => {
           console.log(userAttributes);
           cognitoUser.completeNewPasswordChallenge(
             authenticationData.Password,
@@ -70,7 +91,11 @@ export class Auth {
    */
   async isLogined(): Promise<CognitoUserSession> {
     const promsie = new Promise<CognitoUserSession>((resolve, reject) => {
-      const currentUser = this.userPool.getCurrentUser();
+      if (!this.isSetUp) {
+        reject(new AuthIsNotSetUpError());
+        return;
+      }
+      const currentUser = this.userPool!.getCurrentUser();
       if (!currentUser)
         return reject(new Error("ユーザーを取得することができませんでした。"));
 
@@ -85,5 +110,12 @@ export class Auth {
       });
     });
     return promsie;
+  }
+}
+
+class AuthIsNotSetUpError extends Error {
+  constructor(args?: any) {
+    super(args);
+    this.name = "AuthIsNotSetUpError";
   }
 }

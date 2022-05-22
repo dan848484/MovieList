@@ -8,7 +8,7 @@ import {
 import { createTheme } from "@mui/system";
 import React, { ChangeEvent, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../redux/hooks";
-import { Movie } from "../pages/Movie.model";
+import { Movie } from "../model/Movie.model";
 import { edit } from "../redux/Slices/movieSlice";
 import { setMovie, open, close } from "../redux/Slices/dialogSlice";
 

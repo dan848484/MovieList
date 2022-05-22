@@ -1,5 +1,5 @@
 import type { NextPage } from "next";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../redux/hooks";
 import { add } from "../redux/Slices/movieSlice";
 import { ListElement } from "../Components/ListElement";
@@ -7,6 +7,7 @@ import { createTheme, IconButton } from "@mui/material";
 import { AddButton } from "../Components/AddButton";
 import { AddDialog } from "../Components/AddDialog";
 import { EditDialog } from "../Components/EditDialog";
+import { Auth } from "../auth/Auth";
 
 const Home: NextPage = () => {
   const movies = useAppSelector((state) => state.movies);
@@ -14,6 +15,8 @@ const Home: NextPage = () => {
   const listElements = movies.movies.map((m, i) => {
     return <ListElement key={i} movie={m}></ListElement>;
   });
+
+
 
   const [addingDialogState, setAddingDialogState] = useState(false);
   const onAddButtonClick = () => {

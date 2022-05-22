@@ -1,7 +1,7 @@
 import { createTheme, width } from "@mui/system";
 import React, { useState } from "react";
 import { useAppDispatch, useAppSelector } from "../redux/hooks";
-import { Movie } from "../pages/Movie.model";
+import { Movie } from "../model/Movie.model";
 import { remove, mark, unmark } from "../redux/Slices/movieSlice";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import {

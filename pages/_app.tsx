@@ -5,8 +5,10 @@ import { Auth } from "../auth/Auth";
 import { store } from "../redux/store";
 import "../styles/globals.css";
 import { LoginForm } from "../Components/LoginForm";
+import CircularProgress from "@mui/material/CircularProgress";
 
 function MyApp({ Component, pageProps }: AppProps) {
+  const [isLoading, setIsLoading] = React.useState(true);
   const [loginRequired, setLoginRequired] = React.useState(true);
   const [auth] = React.useState(new Auth());
 
@@ -20,22 +22,37 @@ function MyApp({ Component, pageProps }: AppProps) {
   useEffect(() => {
     (async () => {
       try {
+        await auth.setUpAuth();
         const session = await auth.isLogined();
-        console.log(session);
+
         setLoginRequired(false);
       } catch (error) {
         console.log(
-          "ログインが完了していません。ログインフォームに遷移します。"
+          "ログインが完了していません。ログインフォームに遷移します。",
+          error
         );
       }
+      setIsLoading(false);
     })();
   }, []);
-  const content = loginRequired ? (
-    <LoginForm onComplete={handleFormComplete} auth={auth}></LoginForm>
-  ) : (
-    <Component {...pageProps} />
+
+  return (
+    <Provider store={store}>
+      {isLoading && (
+        <div className="w-screen h-screen flex justify-center items-center ">
+          <CircularProgress className="[zoom:1.5]" />
+        </div>
+      )}
+      {!isLoading && (
+        <>
+          {loginRequired && (
+            <LoginForm onComplete={handleFormComplete} auth={auth}></LoginForm>
+          )}
+          {!loginRequired && <Component {...pageProps} />}
+        </>
+      )}
+    </Provider>
   );
-  return <Provider store={store}>{content}</Provider>;
 }
 
 export default MyApp;
