@@ -2,7 +2,7 @@ import { createTheme, width } from "@mui/system";
 import React, { useState } from "react";
 import { useAppDispatch, useAppSelector } from "../redux/hooks";
 import { Movie } from "../model/Movie.model";
-import { remove, mark, unmark } from "../redux/Slices/movieSlice";
+// import { remove, mark, unmark } from "../redux/Slices/movieSlice";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import {
   Button,
@@ -14,6 +14,7 @@ import {
 import RemoveCircleOutlineIcon from "@mui/icons-material/RemoveCircleOutline";
 import EditIcon from "@mui/icons-material/Edit";
 import { setMovie, open, close } from "../redux/Slices/dialogSlice";
+import { updateMovie, deleteMovie } from "../redux/Slices/movieSlice";
 
 interface Props {
   movie: Movie;
@@ -26,11 +27,13 @@ export const ListElement = (props: Props) => {
   let movie = props.movie;
 
   const onMarkClick = () => {
-    if (movie.watched) {
-      dispatch(unmark({ id: movie.id }));
-      return;
-    }
-    dispatch(mark({ id: movie.id }));
+    dispatch(
+      updateMovie({
+        id: movie.id,
+        target: "watched",
+        value: !movie.watched,
+      })
+    );
   };
 
   const onMenuClick = () => {
@@ -41,9 +44,8 @@ export const ListElement = (props: Props) => {
     dispatch(setMovie({ movie, kind: "edit" }));
     dispatch(open("edit"));
   };
-  const removeMovie = () => {
-    dispatch(remove(props.movie));
-    setMenuState(false);
+  const removeMovie = async () => {
+    dispatch(deleteMovie(movie.id));
   };
   return (
     <div

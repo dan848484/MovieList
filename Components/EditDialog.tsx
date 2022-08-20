@@ -9,7 +9,7 @@ import { createTheme } from "@mui/system";
 import React, { ChangeEvent, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../redux/hooks";
 import { Movie } from "../model/Movie.model";
-import { edit } from "../redux/Slices/movieSlice";
+import { updateMovie } from "../redux/Slices/movieSlice";
 import { setMovie, open, close } from "../redux/Slices/dialogSlice";
 
 export const EditDialog = () => {
@@ -30,9 +30,13 @@ export const EditDialog = () => {
       setHelperText("入力してください。");
       return;
     }
-    let payload = { ...movie!, newName: name };
-    console.log(payload);
-    dispatch(edit(payload));
+    dispatch(
+      updateMovie({
+        id: movie!.id,
+        target: "name",
+        value: name,
+      })
+    );
     closeDialog();
   };
 

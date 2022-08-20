@@ -1,6 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { Movie } from "../../model/Movie.model";
-
 type Kinds = "edit";
 
 type dialogState = Record<

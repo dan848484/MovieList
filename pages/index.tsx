@@ -1,30 +1,38 @@
 import type { NextPage } from "next";
 import React, { useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../redux/hooks";
-import { add } from "../redux/Slices/movieSlice";
+import { postMovie } from "../redux/Slices/movieSlice";
 import { ListElement } from "../Components/ListElement";
-import { createTheme, IconButton } from "@mui/material";
 import { AddButton } from "../Components/AddButton";
 import { AddDialog } from "../Components/AddDialog";
 import { EditDialog } from "../Components/EditDialog";
-import { Auth } from "../auth/Auth";
+import { loadAll } from "../redux/Slices/movieSlice";
 
 const Home: NextPage = () => {
   const movies = useAppSelector((state) => state.movies);
   const dispatch = useAppDispatch();
-  const listElements = movies.movies.map((m, i) => {
+  const listElements = (movies.movies || []).map((m, i) => {
     return <ListElement key={i} movie={m}></ListElement>;
   });
-
-
 
   const [addingDialogState, setAddingDialogState] = useState(false);
   const onAddButtonClick = () => {
     setAddingDialogState(!addingDialogState);
   };
-  const addNewMovie = (name: string) => {
-    dispatch(add(name));
+  const addNewMovie = async (name: string) => {
+    try {
+      dispatch(postMovie(name));
+    } catch (error) {
+      console.error(error);
+    }
   };
+
+  useEffect(() => {
+    // setTimeout(() => {
+    //   dispatch(addMovie("hello"));
+    // }, 1000);
+    dispatch(loadAll());
+  }, []);
 
   return (
     <div

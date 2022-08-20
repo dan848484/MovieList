@@ -61,6 +61,7 @@ export class Auth {
       const callbacks = {
         onSuccess: (result: CognitoUserSession) => {
           console.log("ログイン成功", result);
+
           resolve(result);
         },
         onFailure: (result: any) => {

@@ -6,6 +6,7 @@ import { store } from "../redux/store";
 import "../styles/globals.css";
 import { LoginForm } from "../Components/LoginForm";
 import CircularProgress from "@mui/material/CircularProgress";
+import { useAppDispatch } from "../redux/hooks";
 
 function MyApp({ Component, pageProps }: AppProps) {
   const [isLoading, setIsLoading] = React.useState(true);
@@ -13,7 +14,7 @@ function MyApp({ Component, pageProps }: AppProps) {
   const [auth] = React.useState(new Auth());
 
   /**
-   * ログイン成功時に実行する関数
+   * ログイン成功時
    */
   const handleFormComplete = () => {
     setLoginRequired(false);
@@ -24,7 +25,6 @@ function MyApp({ Component, pageProps }: AppProps) {
       try {
         await auth.setUpAuth();
         const session = await auth.isLogined();
-
         setLoginRequired(false);
       } catch (error) {
         console.log(
