@@ -1,5 +1,5 @@
 import { createTheme, width } from "@mui/system";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../redux/hooks";
 import { Movie } from "../model/Movie.model";
 // import { remove, mark, unmark } from "../redux/Slices/movieSlice";
@@ -26,6 +26,7 @@ export const ListElement = (props: Props) => {
 
   let movie = props.movie;
 
+  useEffect(() => {});
   const onMarkClick = () => {
     dispatch(
       updateMovie({

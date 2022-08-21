@@ -7,6 +7,7 @@ import {
 } from "@reduxjs/toolkit";
 import type { RootState } from "../store";
 import { Movie, IMovie } from "../../model/Movie.model";
+import config from "../../Movielist.config";
 
 interface MovieState {
   movies: Movie[] | undefined;
@@ -59,7 +60,7 @@ export const deleteMovie = createAsyncThunk<string, string>(
   async (id, api) => {
     try {
     } catch (error) {}
-    let response = await fetch(`/api/proxy/delete?id=${id}`);
+    let response: Response = await fetch(`/api/proxy/delete?id=${id}`);
     if (response.ok) {
       return id;
     } else {
@@ -80,6 +81,7 @@ export const updateMovie = createAsyncThunk<Movie, updateOption>(
       let movie: Movie = {
         ...result,
         hidden: false,
+        isBeingUpdated: true,
       };
       return movie;
     } catch (error) {
@@ -100,27 +102,10 @@ export const loadAll = createAsyncThunk<Movie[]>(
 export const movieSlice = createSlice({
   name: "movies",
   initialState,
-  reducers: {
-    // add: (state, action: PayloadAction<Movie>) => {
-    //   if (!state.movies) state.movies = [];
-    //   state.movies.push(action.payload);
-    // },
-    // update: (state, action: PayloadAction<Movie>) => {
-    //   if (!state.movies) return;
-    //   const index = state.movies.findIndex((m) => {
-    //     return m.id === action.payload.id;
-    //   });
-    //   if (index < 0) {
-    //     return;
-    //   }
-    //   state.movies[index] = action.payload;
-    // },
-  },
+  reducers: {},
   extraReducers: (builder) => {
     builder
-      .addCase(postMovie.pending, (state, action) => {
-        // action.meta.arg;
-      })
+      .addCase(postMovie.pending, (state, action) => {})
       .addCase(postMovie.fulfilled, (state, action) => {
         state.movies = [...(state.movies || []), action.payload];
         state.movies.sort((a, b) => {
@@ -135,35 +120,41 @@ export const movieSlice = createSlice({
         );
         if (index < 0) return;
         let movie = state.movies[index];
-        (movie[action.meta.arg.target] as any) = action.meta.arg.value;
+        movie.isBeingUpdated = true;
       })
       .addCase(updateMovie.rejected, (state, action) => {
         console.error(action.payload);
-        state.movies = state.movies!.filter((m) => {
-          return m.id === action.payload;
-        });
-        //pendingの時点で変更しているんだけど、rejectされた時はもとの設定に戻すみたいなことを過去の自分はやりたかったんだと思う。
+        const index = state.movies!.findIndex(
+          (m) => m.id === action.meta.arg.id
+        );
+        if (!index) return;
+        state.movies![index!].isBeingUpdated = false;
       })
       .addCase(updateMovie.fulfilled, (state, action) => {
-        // if (!state.movies) return;
-        // for (let i = 0; i < state.movies.length; i++) {
-        //   if (state.movies[i].id != action.payload.id) continue;
-        //   state.movies[i] = action.payload;
-        //   break;
-        // }
+        const updatedMovie = action.payload;
+        updatedMovie.isBeingUpdated = false;
+        const index = state!.movies!.findIndex((m) => m.id === updatedMovie.id);
+        state!.movies![index] = updatedMovie;
+      })
+      .addCase(deleteMovie.pending, (state, action) => {
+        const id = action.meta.arg;
+        const movie = state.movies!.find((m) => m.id === id);
+        movie && (movie.hidden = true);
       })
       .addCase(deleteMovie.fulfilled, (state, action) => {
         if (!state.movies) return;
         state.movies = state.movies.filter((m) => m.id !== action.payload);
       })
-      .addCase(deleteMovie.rejected, (state, action) => {})
+      .addCase(deleteMovie.rejected, (state, action) => {
+        const id = action.meta.arg;
+        const movie = state.movies!.find((m) => m.id === id);
+        movie && (movie.hidden = false);
+      })
       .addCase(loadAll.fulfilled, (state, action) => {
         state.movies = action.payload;
       });
   },
 });
-
-// const { add, update } = movieSlice.actions;
 
 export const selectMovies = (state: RootState) => state.movies;
 

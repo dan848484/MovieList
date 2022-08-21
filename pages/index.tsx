@@ -11,9 +11,13 @@ import { loadAll } from "../redux/Slices/movieSlice";
 const Home: NextPage = () => {
   const movies = useAppSelector((state) => state.movies);
   const dispatch = useAppDispatch();
-  const listElements = (movies.movies || []).map((m, i) => {
-    return <ListElement key={i} movie={m}></ListElement>;
-  });
+  const listElements = (movies.movies || [])
+    .filter((m) => {
+      return !m.hidden;
+    })
+    .map((m, i) => {
+      return <ListElement key={i} movie={m}></ListElement>;
+    });
 
   const [addingDialogState, setAddingDialogState] = useState(false);
   const onAddButtonClick = () => {
@@ -28,9 +32,6 @@ const Home: NextPage = () => {
   };
 
   useEffect(() => {
-    // setTimeout(() => {
-    //   dispatch(addMovie("hello"));
-    // }, 1000);
     dispatch(loadAll());
   }, []);
 
