@@ -34,6 +34,11 @@ const initialState: MovieState = {
   movies: undefined,
 };
 
+/**
+ * 現在更新中のMovieを記録しておくキャッシュ
+ */
+const movieChache: Record<string, Movie> = {};
+
 export const postMovie = createAsyncThunk<Movie, string>(
   "movies/postMovie",
   async (movieName, api) => {
@@ -120,7 +125,10 @@ export const movieSlice = createSlice({
         );
         if (index < 0) return;
         let movie = state.movies[index];
+        movieChache[action.meta.arg.id] = Object.assign({}, movie);
         movie.isBeingUpdated = true;
+        (movie[action.meta.arg.target] as string | number | boolean) =
+          action.meta.arg.value;
       })
       .addCase(updateMovie.rejected, (state, action) => {
         console.error(action.payload);
@@ -128,13 +136,14 @@ export const movieSlice = createSlice({
           (m) => m.id === action.meta.arg.id
         );
         if (!index) return;
-        state.movies![index!].isBeingUpdated = false;
+        state.movies![index!] = movieChache[state.movies![index].id];
+        delete movieChache[state.movies![index].id];
       })
       .addCase(updateMovie.fulfilled, (state, action) => {
         const updatedMovie = action.payload;
-        updatedMovie.isBeingUpdated = false;
         const index = state!.movies!.findIndex((m) => m.id === updatedMovie.id);
-        state!.movies![index] = updatedMovie;
+        state!.movies![index].isBeingUpdated = false;
+        delete movieChache[state.movies![index].id];
       })
       .addCase(deleteMovie.pending, (state, action) => {
         const id = action.meta.arg;

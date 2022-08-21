@@ -47,6 +47,7 @@ export const ListElement = (props: Props) => {
   };
   const removeMovie = async () => {
     dispatch(deleteMovie(movie.id));
+    setMenuState(false);
   };
   return (
     <div
