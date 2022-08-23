@@ -91,7 +91,7 @@ export const updateMovie = createAsyncThunk<Movie, updateOption>(
       return movie;
     } catch (error) {
       console.log(error);
-      return api.rejectWithValue(error);
+      return api.rejectWithValue({});
     }
   }
 );
@@ -131,18 +131,26 @@ export const movieSlice = createSlice({
           action.meta.arg.value;
       })
       .addCase(updateMovie.rejected, (state, action) => {
-        console.error(action.payload);
-        const index = state.movies!.findIndex(
-          (m) => m.id === action.meta.arg.id
-        );
-        if (!index) return;
-        state.movies![index!] = movieChache[state.movies![index].id];
-        delete movieChache[state.movies![index].id];
+        try {
+          const index = state.movies!.findIndex(
+            (m) => m.id === action.meta.arg.id
+          );
+          if (index < 0) return;
+          state.movies![index!] = movieChache[index];
+          delete movieChache[state.movies![index].id];
+        } catch (error) {
+          console.error(error);
+        }
       })
       .addCase(updateMovie.fulfilled, (state, action) => {
         const updatedMovie = action.payload;
         const index = state!.movies!.findIndex((m) => m.id === updatedMovie.id);
-        state!.movies![index].isBeingUpdated = false;
+        try {
+          state!.movies![index].isBeingUpdated = false;
+        } catch (error) {
+          console.error(error);
+        }
+
         delete movieChache[state.movies![index].id];
       })
       .addCase(deleteMovie.pending, (state, action) => {

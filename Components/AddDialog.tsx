@@ -6,7 +6,7 @@ import {
   ThemeProvider,
 } from "@mui/material";
 import { createTheme } from "@mui/system";
-import React, { ChangeEvent, useState } from "react";
+import React, { ChangeEvent, useEffect, useState } from "react";
 
 interface Props {
   onClick: (name: string) => void;
@@ -18,6 +18,7 @@ export const AddDialog = (props: Props) => {
   const [name, setName] = useState("");
   const [inputError, setInputError] = useState(false);
   const [helperText, setHelperText] = useState("");
+  const [sending, setSending] = useState(false);
 
   const onClick = () => {
     if (name == "") {
@@ -26,6 +27,7 @@ export const AddDialog = (props: Props) => {
       return;
     }
     props.onClick(name);
+
     close();
   };
 

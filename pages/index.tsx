@@ -7,16 +7,37 @@ import { AddButton } from "../Components/AddButton";
 import { AddDialog } from "../Components/AddDialog";
 import { EditDialog } from "../Components/EditDialog";
 import { loadAll } from "../redux/Slices/movieSlice";
+import MovieOutlinedIcon from "@mui/icons-material/MovieOutlined";
+import { ListElementSkelton } from "../Components/ListElementSkelton";
 
 const Home: NextPage = () => {
   const movies = useAppSelector((state) => state.movies);
   const dispatch = useAppDispatch();
-  const listElements = (movies.movies || [])
+  const completedMovies = (movies.movies || [])
     .filter((m) => {
       return !m.hidden;
     })
+    .filter((m) => {
+      return !m.watched;
+    })
     .map((m, i) => {
       return <ListElement key={i} movie={m}></ListElement>;
+    });
+  const uncompletedMovies = (movies.movies || [])
+    .filter((m) => {
+      return !m.hidden;
+    })
+    .filter((m) => {
+      return m.watched;
+    })
+    .map((m, i) => {
+      return <ListElement key={i} movie={m}></ListElement>;
+    });
+
+  const skeletonListElements = Array<typeof ListElementSkelton>(5)
+    .fill(() => <></>)
+    .map((_, i) => {
+      return <ListElementSkelton key={i}></ListElementSkelton>;
     });
 
   const [addingDialogState, setAddingDialogState] = useState(false);
@@ -52,7 +73,9 @@ const Home: NextPage = () => {
         <span className="relative top-[23px] ">MovieList</span>
       </div>
       <div className="grow mt-16">
-        {listElements}
+        {movies.movies ? completedMovies : skeletonListElements}
+        <p className="text-lg font-bold text-gray-800 mt-2 py-5">視聴済み</p>
+        {movies.movies ? uncompletedMovies : skeletonListElements}
         <AddButton
           className="fixed bottom-7 right-6 z-10"
           onClick={onAddButtonClick}

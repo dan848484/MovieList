@@ -26,7 +26,6 @@ export const ListElement = (props: Props) => {
 
   let movie = props.movie;
 
-  useEffect(() => {});
   const onMarkClick = () => {
     dispatch(
       updateMovie({
