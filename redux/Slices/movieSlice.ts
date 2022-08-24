@@ -39,67 +39,85 @@ const initialState: MovieState = {
  */
 const movieChache: Record<string, Movie> = {};
 
-export const postMovie = createAsyncThunk<Movie, string>(
-  "movies/postMovie",
-  async (movieName, api) => {
-    try {
-      const result: IMovie = await (
-        await fetch(`/api/proxy/add?name=${movieName}`, {
-          method: "POST",
-        })
-      ).json();
-      const movie: Movie = {
-        ...result,
-        hidden: false,
-        isBeingUpdated: false,
-      };
-      return movie;
-    } catch (error) {
-      return api.rejectWithValue(error);
-    }
+export const postMovie = createAsyncThunk<
+  Movie,
+  { movieName: string; token: string }
+>("movies/postMovie", async (arg, api) => {
+  try {
+    const result: IMovie = await (
+      await fetch(`/api/proxy/add?name=${arg.movieName}`, {
+        method: "POST",
+        headers: {
+          Authorization: "Bearer " + arg.token,
+        },
+      })
+    ).json();
+    const movie: Movie = {
+      ...result,
+      hidden: false,
+      isBeingUpdated: false,
+    };
+    return movie;
+  } catch (error) {
+    return api.rejectWithValue(error);
   }
-);
+});
 
-export const deleteMovie = createAsyncThunk<string, string>(
-  "movies/deleteMovie",
-  async (id, api) => {
-    try {
-    } catch (error) {}
-    let response: Response = await fetch(`/api/proxy/delete?id=${id}`);
-    if (response.ok) {
-      return id;
-    } else {
-      return api.rejectWithValue(response);
-    }
+export const deleteMovie = createAsyncThunk<
+  string,
+  { id: string; token: string }
+>("movies/deleteMovie", async (arg, api) => {
+  try {
+  } catch (error) {}
+  let response: Response = await fetch(`/api/proxy/delete?id=${arg.id}`, {
+    headers: {
+      Authorization: "Bearer " + arg.token,
+    },
+  });
+  if (response.ok) {
+    return arg.id;
+  } else {
+    return api.rejectWithValue(response);
   }
-);
+});
 
-export const updateMovie = createAsyncThunk<Movie, updateOption>(
-  "movies/updateMovie",
-  async (option: updateOption, api) => {
-    try {
-      const result: IMovie = await (
-        await fetch(
-          `/api/proxy/update?id=${option.id}&type=${option.target}&value=${option.value}`
-        )
-      ).json();
-      let movie: Movie = {
-        ...result,
-        hidden: false,
-        isBeingUpdated: true,
-      };
-      return movie;
-    } catch (error) {
-      console.log(error);
-      return api.rejectWithValue({});
-    }
+export const updateMovie = createAsyncThunk<
+  Movie,
+  { option: updateOption; token: string }
+>("movies/updateMovie", async (arg, api) => {
+  try {
+    const result: IMovie = await (
+      await fetch(
+        `/api/proxy/update?id=${arg.option.id}&type=${arg.option.target}&value=${arg.option.value}`,
+        {
+          headers: {
+            Authorization: "Bearer " + arg.token,
+          },
+        }
+      )
+    ).json();
+    let movie: Movie = {
+      ...result,
+      hidden: false,
+      isBeingUpdated: true,
+    };
+    return movie;
+  } catch (error) {
+    console.log(error);
+    return api.rejectWithValue({});
   }
-);
+});
 
-export const loadAll = createAsyncThunk<Movie[]>(
+export const loadAll = createAsyncThunk<Movie[], { token: string }>(
   "movies/loadAll",
-  async (_, api) => {
-    const movies: IMovie[] = await (await fetch("/api/proxy/items")).json();
+  async (arg, api) => {
+    const movies: IMovie[] = await (
+      await fetch("/api/proxy/items", {
+        headers: {
+          Authorization: "Bearer " + arg.token,
+        },
+      })
+    ).json();
     return movies.map((m) => ({ ...m, hidden: false, isBeingUpdated: false }));
   }
 );
@@ -121,19 +139,19 @@ export const movieSlice = createSlice({
       .addCase(updateMovie.pending, (state, action) => {
         if (!state.movies) return;
         const index = state.movies.findIndex(
-          (m) => m.id === action.meta.arg.id
+          (m) => m.id === action.meta.arg.option.id
         );
         if (index < 0) return;
         let movie = state.movies[index];
-        movieChache[action.meta.arg.id] = Object.assign({}, movie);
+        movieChache[action.meta.arg.option.id] = Object.assign({}, movie);
         movie.isBeingUpdated = true;
-        (movie[action.meta.arg.target] as string | number | boolean) =
-          action.meta.arg.value;
+        (movie[action.meta.arg.option.target] as string | number | boolean) =
+          action.meta.arg.option.value;
       })
       .addCase(updateMovie.rejected, (state, action) => {
         try {
           const index = state.movies!.findIndex(
-            (m) => m.id === action.meta.arg.id
+            (m) => m.id === action.meta.arg.option.id
           );
           if (index < 0) return;
           state.movies![index!] = movieChache[index];
@@ -154,7 +172,7 @@ export const movieSlice = createSlice({
         delete movieChache[state.movies![index].id];
       })
       .addCase(deleteMovie.pending, (state, action) => {
-        const id = action.meta.arg;
+        const id = action.meta.arg.id;
         const movie = state.movies!.find((m) => m.id === id);
         movie && (movie.hidden = true);
       })
@@ -163,7 +181,7 @@ export const movieSlice = createSlice({
         state.movies = state.movies.filter((m) => m.id !== action.payload);
       })
       .addCase(deleteMovie.rejected, (state, action) => {
-        const id = action.meta.arg;
+        const id = action.meta.arg.id;
         const movie = state.movies!.find((m) => m.id === id);
         movie && (movie.hidden = false);
       })

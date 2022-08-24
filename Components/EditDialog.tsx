@@ -6,16 +6,19 @@ import {
   ThemeProvider,
 } from "@mui/material";
 import { createTheme } from "@mui/system";
-import React, { ChangeEvent, useState } from "react";
+import React, { ChangeEvent, useContext, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../redux/hooks";
 import { Movie } from "../model/Movie.model";
 import { updateMovie } from "../redux/Slices/movieSlice";
 import { setMovie, open, close } from "../redux/Slices/dialogSlice";
+import { TokenContext } from "../pages/_app";
 
 export const EditDialog = () => {
   const [name, setName] = useState("");
   const [inputError, setInputError] = useState(false);
   const [helperText, setHelperText] = useState("");
+  const token = useContext(TokenContext);
+
   const dispatch = useAppDispatch();
   let movie = useAppSelector((state) => {
     return state.dialog.edit.movie;
@@ -32,9 +35,12 @@ export const EditDialog = () => {
     }
     dispatch(
       updateMovie({
-        id: movie!.id,
-        target: "name",
-        value: name,
+        token,
+        option: {
+          id: movie!.id,
+          target: "name",
+          value: name,
+        },
       })
     );
     closeDialog();

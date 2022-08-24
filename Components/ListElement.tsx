@@ -1,5 +1,5 @@
 import { createTheme, width } from "@mui/system";
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../redux/hooks";
 import { Movie } from "../model/Movie.model";
 // import { remove, mark, unmark } from "../redux/Slices/movieSlice";
@@ -15,6 +15,7 @@ import RemoveCircleOutlineIcon from "@mui/icons-material/RemoveCircleOutline";
 import EditIcon from "@mui/icons-material/Edit";
 import { setMovie, open, close } from "../redux/Slices/dialogSlice";
 import { updateMovie, deleteMovie } from "../redux/Slices/movieSlice";
+import { TokenContext } from "../pages/_app";
 
 interface Props {
   movie: Movie;
@@ -23,15 +24,19 @@ interface Props {
 export const ListElement = (props: Props) => {
   const [menuState, setMenuState] = useState(false);
   const dispatch = useAppDispatch();
+  const token = useContext(TokenContext);
 
   let movie = props.movie;
 
   const onMarkClick = () => {
     dispatch(
       updateMovie({
-        id: movie.id,
-        target: "watched",
-        value: !movie.watched,
+        token,
+        option: {
+          id: movie.id,
+          target: "watched",
+          value: !movie.watched,
+        },
       })
     );
   };
@@ -45,7 +50,12 @@ export const ListElement = (props: Props) => {
     dispatch(open("edit"));
   };
   const removeMovie = async () => {
-    dispatch(deleteMovie(movie.id));
+    dispatch(
+      deleteMovie({
+        id: movie.id,
+        token: "",
+      })
+    );
     setMenuState(false);
   };
   return (
