@@ -5,7 +5,7 @@ import { Auth } from "../auth/Auth";
 import { store } from "../redux/store";
 import "../styles/globals.css";
 import { LoginForm } from "../Components/LoginForm";
-import CircularProgress from "@mui/material/CircularProgress";
+import { CircularProgress } from "@mui/material";
 import { useAppDispatch } from "../redux/hooks";
 
 export const TokenContext = createContext("");
