@@ -27,7 +27,7 @@ export class Auth {
       ClientId: userpoolIds.client_id,
     };
 
-    console.log(this.poolData);
+    // console.log(this.poolData);
 
     this.userPool = new CognitoUserPool(this.poolData);
     this._isSetUp = true;
@@ -60,19 +60,18 @@ export class Auth {
 
       const callbacks = {
         onSuccess: (result: CognitoUserSession) => {
-          console.log("ログイン成功", result);
-          console.log(result.getAccessToken());
+          console.log("ログイン成功");
           resolve(result);
         },
         onFailure: (result: any) => {
-          console.log("ログイン失敗", result);
+          console.log("ログイン失敗");
           reject(new Error(result));
         },
         newPasswordRequired: (
           userAttributes: UserAttributes,
           requiredAttributes: any
         ) => {
-          console.log(userAttributes);
+          // console.log(userAttributes);
           cognitoUser.completeNewPasswordChallenge(
             authenticationData.Password,
             {},

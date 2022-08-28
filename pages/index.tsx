@@ -42,6 +42,10 @@ const Home: NextPage = () => {
       return <ListElementSkelton key={i}></ListElementSkelton>;
     });
 
+  useEffect(() => {
+    dispatch(loadAll({ token }));
+  }, [token]);
+
   const [addingDialogState, setAddingDialogState] = useState(false);
   const onAddButtonClick = () => {
     setAddingDialogState(!addingDialogState);
@@ -58,10 +62,6 @@ const Home: NextPage = () => {
       console.error(error);
     }
   };
-
-  useEffect(() => {
-    dispatch(loadAll({ token }));
-  }, []);
 
   return (
     <div

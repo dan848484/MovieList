@@ -53,7 +53,7 @@ export const ListElement = (props: Props) => {
     dispatch(
       deleteMovie({
         id: movie.id,
-        token: "",
+        token,
       })
     );
     setMenuState(false);

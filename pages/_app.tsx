@@ -40,6 +40,13 @@ function MyApp({ Component, pageProps }: AppProps) {
     })();
   }, []);
 
+  useEffect(() => {
+    (async () => {
+      if (!loginRequired)
+        setToken((await auth.isLogined()).getIdToken().getJwtToken());
+    })();
+  }, [loginRequired]);
+
   return (
     <Provider store={store}>
       <TokenContext.Provider value={token}>
