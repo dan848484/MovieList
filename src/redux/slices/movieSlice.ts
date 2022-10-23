@@ -7,7 +7,7 @@ import {
 } from "@reduxjs/toolkit";
 import type { RootState } from "../store";
 import { Movie, IMovie } from "../../model/Movie.model";
-import config from "../../Movielist.config";
+import config from "../../../Movielist.config";
 
 interface MovieState {
   movies: Movie[] | undefined;

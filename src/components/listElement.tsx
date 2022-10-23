@@ -13,10 +13,10 @@ import {
 } from "@mui/material";
 import RemoveCircleOutlineIcon from "@mui/icons-material/RemoveCircleOutline";
 import EditIcon from "@mui/icons-material/Edit";
-import { setMovie, open, close } from "../redux/Slices/dialogSlice";
-import { updateMovie, deleteMovie } from "../redux/Slices/movieSlice";
-import { TokenContext } from "../pages/_app";
-
+import { updateMovie, deleteMovie } from "../redux/slices/movieSlice";
+import { TokenContext } from "./auth";
+import { useDialog } from "../hooks/useDialog";
+import { EditDialogContent } from "./dialogContents/editDialogContent";
 interface Props {
   movie: Movie;
 }
@@ -25,6 +25,24 @@ export const ListElement = (props: Props) => {
   const [menuState, setMenuState] = useState(false);
   const dispatch = useAppDispatch();
   const token = useContext(TokenContext);
+  const [EditDialog, open, close, isOpen] = useDialog(
+    EditDialogContent,
+    props.movie,
+    (value?: string) => {
+      if (value) {
+        dispatch(
+          updateMovie({
+            token,
+            option: {
+              id: movie!.id,
+              target: "name",
+              value,
+            },
+          })
+        );
+      }
+    }
+  );
 
   let movie = props.movie;
 
@@ -46,9 +64,9 @@ export const ListElement = (props: Props) => {
   };
 
   const editMovie = () => {
-    dispatch(setMovie({ movie, kind: "edit" }));
-    dispatch(open("edit"));
+    open();
   };
+
   const removeMovie = async () => {
     dispatch(
       deleteMovie({
@@ -113,6 +131,7 @@ export const ListElement = (props: Props) => {
           </Grow>
         </div>
       </ClickAwayListener>
+      {EditDialog}
     </div>
   );
 };
