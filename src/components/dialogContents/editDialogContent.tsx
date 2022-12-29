@@ -9,8 +9,6 @@ import React, {
 } from "react";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
 import { Movie } from "../../model/Movie.model";
-import { updateMovie } from "../../redux/slices/movieSlice";
-import { TokenContext } from "../auth";
 import {
   DialogContent,
   DialogContentProps,

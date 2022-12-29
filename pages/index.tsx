@@ -7,36 +7,32 @@ import { AddDialogContent } from "../src/components/dialogContents/addDialogCont
 import { useDialog } from "../src/hooks/useDialog";
 // import { loadAll } from "../src/redux/slices/movieSlice";
 import { ListElementSkelton } from "../src/components/listElementSkelton";
-import { TokenContext } from "../src/components/auth";
 import {
   movieApi,
   useGetMoviesQuery,
   usePostMovieMutation,
-} from "../src/services/movieService";
+} from "../src/redux/services/movieService";
 import axios from "axios";
 import { Movie } from "../src/model/Movie.model";
+import { useSelector } from "react-redux";
+import { RootState } from "../src/redux/store";
 const Home: NextPage = () => {
-  // const movies = useAppSelector((state) => state.movies);
-  const dispatch = useAppDispatch();
-  const token = useContext(TokenContext);
+  const token = useSelector((state: RootState) => state.token.value);
   const [AddDialog, open, close, isOpen] = useDialog(
     AddDialogContent,
     undefined,
     async (name?: string) => {
       if (name) {
         try {
-          updateMovie({
-            name,
-            token,
-          });
+          updateMovie(name);
         } catch (error) {
           console.error(error);
         }
       }
     }
   );
-  const movies = useGetMoviesQuery(token);
-  const [updateMovie, result] = usePostMovieMutation();
+  const movies = useGetMoviesQuery(undefined);
+  const [updateMovie] = usePostMovieMutation();
   const completedMovies = (movies.data || [])
     .filter((m) => {
       return !m.hidden;
@@ -64,14 +60,13 @@ const Home: NextPage = () => {
       return <ListElementSkelton key={i}></ListElementSkelton>;
     });
 
-  useEffect(() => {
-    // dispatch(loadAll({ token }));
-  }, [token]);
-
   const onAddButtonClick = () => {
     open();
   };
 
+  useEffect(() => {
+    movies.refetch();
+  }, [token]);
   return (
     <div
       className="

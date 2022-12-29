@@ -1,19 +1,23 @@
 import { CircularProgress } from "@mui/material";
 import { useState, useEffect, FCX, createContext, ReactNode } from "react";
+import { useDispatch } from "react-redux";
 import { Auth } from "../auth/auth";
+import { setToken } from "../redux/slices/tokenSlice";
+import { useGetMoviesQuery } from "../redux/services/movieService";
 import { LoginForm } from "./loginForm";
+import { useSelector } from "react-redux";
+import { RootState } from "../redux/store";
 
 interface AuthComponentProps {
   children?: ReactNode;
 }
 
-export const TokenContext = createContext("");
-
 export const AuthComponent: FCX<AuthComponentProps> = (props) => {
   const [isLoading, setIsLoading] = useState(true);
   const [loginRequired, setLoginRequired] = useState(true);
-  const [auth] = useState(new Auth());
-  const [token, setToken] = useState("");
+  const token = useSelector((state: RootState) => state.token.value);
+  const [auth, setAuth] = useState(new Auth());
+  const dispatch = useDispatch();
 
   /**
    * ログイン成功時
@@ -27,8 +31,12 @@ export const AuthComponent: FCX<AuthComponentProps> = (props) => {
       try {
         await auth.setUpAuth();
         const session = await auth.isLogined();
-        setToken(session.getIdToken().getJwtToken());
         setLoginRequired(false);
+        dispatch(
+          setToken({
+            value: session.getIdToken().getJwtToken(),
+          })
+        );
       } catch (error) {
         console.log(
           "ログインが完了していません。ログインフォームに遷移します。",
@@ -41,24 +49,19 @@ export const AuthComponent: FCX<AuthComponentProps> = (props) => {
 
   return (
     <>
-      <TokenContext.Provider value={token}>
-        {isLoading && (
-          <div className="w-screen h-screen flex justify-center items-center ">
-            <CircularProgress className="[zoom:1.5]" />
-          </div>
-        )}
-        {!isLoading && (
-          <>
-            {loginRequired && (
-              <LoginForm
-                onComplete={handleFormComplete}
-                auth={auth}
-              ></LoginForm>
-            )}
-            {!loginRequired && props.children}
-          </>
-        )}
-      </TokenContext.Provider>
+      {isLoading && (
+        <div className="w-screen h-screen flex justify-center items-center ">
+          <CircularProgress className="[zoom:1.5]" />
+        </div>
+      )}
+      {!isLoading && (
+        <>
+          {loginRequired && (
+            <LoginForm onComplete={handleFormComplete} auth={auth}></LoginForm>
+          )}
+          {!loginRequired && props.children}
+        </>
+      )}
     </>
   );
 };

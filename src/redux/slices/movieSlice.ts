@@ -125,33 +125,3 @@ const initialState: MovieState = {
 //     return movies.map((m) => ({ ...m, hidden: false, isBeingUpdated: false }));
 //   }
 // );
-
-export const movieSlice = createSlice({
-  name: "movies",
-  initialState,
-  reducers: {
-    add: (state, action: PayloadAction<Movie>) => {
-      state.movies = [...(state.movies || []), action.payload];
-      state.movies.sort((a, b) => {
-        return b.addedDate - a.addedDate;
-      });
-    },
-    modify: (state, action: PayloadAction<UpdateOption>) => {
-      if (!state.movies) return;
-      const modifiedMovie = action.payload;
-      const index = state!.movies!.findIndex((m) => m.id === modifiedMovie.id);
-      if (index < 0) return;
-      let movie = state.movies[index];
-      (movie[action.payload.target] as string | number | boolean) =
-        action.payload.value;
-      movie.isBeingUpdated = false;
-    },
-    remove: (state, action: PayloadAction<Movie>) => {
-      state.movies = state.movies?.filter((m) => m.id !== action.payload.id);
-    },
-  },
-});
-
-export const selectMovies = (state: RootState) => state.movies;
-export const { add, modify, remove } = movieSlice.actions;
-export default movieSlice.reducer;

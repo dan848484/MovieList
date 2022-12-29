@@ -1,34 +1,38 @@
-import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/dist/query/react";
-import { url } from "inspector";
-import { async } from "rxjs";
-import { Movie } from "../model/Movie.model";
-import { UpdateOption } from "../redux/slices/movieSlice";
+import { createApi } from "@reduxjs/toolkit/dist/query/react";
+import { fetchBaseQuery } from "@reduxjs/toolkit/dist/query";
+import { Movie } from "../../model/Movie.model";
+import { UpdateOption } from "../slices/movieSlice";
+import { RootState } from "../store";
 
 export const movieApi = createApi({
   reducerPath: "movieApi",
-  baseQuery: fetchBaseQuery({ baseUrl: "/api/proxy/" }),
+  baseQuery: fetchBaseQuery({
+    baseUrl: "/api/proxy/",
+    prepareHeaders: (headers, { getState }) => {
+      const token = (getState() as RootState).token.value;
+      if (token) {
+        headers.set("authorization", `Bearer ${token}`);
+      }
+      return headers;
+    },
+  }),
   endpoints: (builder) => ({
-    getMovies: builder.query<Movie[], string>({
-      query: (token) => ({
+    getMovies: builder.query<Movie[], unknown>({
+      query: () => ({
         url: "items",
-        headers: {
-          Authorization: "Bearer " + token,
-        },
       }),
     }),
-    postMovie: builder.mutation<Movie, { name: string; token: string }>({
-      query: (arg) => ({
-        url: `add?name=${arg.name}`,
-        headers: {
-          Authorization: "Bearer " + arg.token,
-        },
+    postMovie: builder.mutation<Movie, string>({
+      query: (name) => ({
+        url: `add?name=${name}`,
+
         method: "post",
       }),
       onQueryStarted: async (arg, api) => {
         try {
           const result = await api.queryFulfilled;
           api.dispatch(
-            movieApi.util.updateQueryData("getMovies", arg.token, (draft) => {
+            movieApi.util.updateQueryData("getMovies", undefined, (draft) => {
               draft.push(result.data);
             })
           );
@@ -37,19 +41,16 @@ export const movieApi = createApi({
         }
       },
     }),
-    updateMovie: builder.mutation<Movie, UpdateOption & { token: string }>({
+    updateMovie: builder.mutation<Movie, UpdateOption>({
       query: (option) => ({
         url: `update?id=${option.id}&type=${option.target}&value=${option.value}`,
         method: "post",
-        headers: {
-          Authorization: "Bearer " + option.token,
-        },
       }),
       onQueryStarted: async (arg, api) => {
         try {
           const result = await api.queryFulfilled;
           api.dispatch(
-            movieApi.util.updateQueryData("getMovies", arg.token, (draft) => {
+            movieApi.util.updateQueryData("getMovies", undefined, (draft) => {
               const index = draft.findIndex((movie) => movie.id === arg.id);
               if (index) {
                 draft[index] = result.data;
@@ -63,20 +64,16 @@ export const movieApi = createApi({
         }
       },
     }),
-    deleteMovie: builder.mutation<unknown, { id: string; token: string }>({
-      query: (arg) => ({
-        url: `delete?id=${arg.id}`,
+    deleteMovie: builder.mutation<unknown, string>({
+      query: (id) => ({
+        url: `delete?id=${id}`,
         method: "post",
-
-        headers: {
-          Authorization: "Bearer " + arg.token,
-        },
       }),
       onQueryStarted: async (arg, api) => {
         try {
           api.dispatch(
-            movieApi.util.updateQueryData("getMovies", arg.token, (draft) => {
-              const index = draft.findIndex((movie) => movie.id === arg.id);
+            movieApi.util.updateQueryData("getMovies", undefined, (draft) => {
+              const index = draft.findIndex((movie) => movie.id === arg);
               draft.splice(index, 1);
             })
           );
