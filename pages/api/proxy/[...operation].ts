@@ -13,7 +13,7 @@ export default async function handler(
     target: config.apiEndPoint,
     pathRewrite: [
       {
-        patternStr: "/api/proxy",
+        patternStr: "/api/proxy/",
         replaceStr: "/",
       },
     ],

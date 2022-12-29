@@ -13,10 +13,14 @@ import {
 } from "@mui/material";
 import RemoveCircleOutlineIcon from "@mui/icons-material/RemoveCircleOutline";
 import EditIcon from "@mui/icons-material/Edit";
-import { updateMovie, deleteMovie } from "../redux/slices/movieSlice";
+// import { updateMovie, deleteMovie } from "../redux/slices/movieSlice";
 import { TokenContext } from "./auth";
 import { useDialog } from "../hooks/useDialog";
 import { EditDialogContent } from "./dialogContents/editDialogContent";
+import {
+  useUpdateMovieMutation,
+  useDeleteMovieMutation,
+} from "../services/movieService";
 interface Props {
   movie: Movie;
 }
@@ -30,33 +34,27 @@ export const ListElement = (props: Props) => {
     props.movie,
     (value?: string) => {
       if (value) {
-        dispatch(
-          updateMovie({
-            token,
-            option: {
-              id: movie!.id,
-              target: "name",
-              value,
-            },
-          })
-        );
+        updateMovie({
+          token,
+          id: movie!.id,
+          target: "name",
+          value,
+        });
       }
     }
   );
+  const [updateMovie] = useUpdateMovieMutation();
+  const [deleteMovie] = useDeleteMovieMutation();
 
   let movie = props.movie;
 
   const onMarkClick = () => {
-    dispatch(
-      updateMovie({
-        token,
-        option: {
-          id: movie.id,
-          target: "watched",
-          value: !movie.watched,
-        },
-      })
-    );
+    updateMovie({
+      token,
+      id: movie.id,
+      target: "watched",
+      value: !movie.watched,
+    });
   };
 
   const onMenuClick = () => {
@@ -68,12 +66,11 @@ export const ListElement = (props: Props) => {
   };
 
   const removeMovie = async () => {
-    dispatch(
-      deleteMovie({
-        id: movie.id,
-        token,
-      })
-    );
+    deleteMovie({
+      id: movie.id,
+      token,
+    });
+
     setMenuState(false);
   };
   return (

@@ -1,38 +1,43 @@
 import type { NextPage } from "next";
 import React, { useContext, useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../src/redux/hooks";
-import { postMovie } from "../src/redux/slices/movieSlice";
 import { ListElement } from "../src/components/listElement";
 import { AddButton } from "../src/components/addButton";
 import { AddDialogContent } from "../src/components/dialogContents/addDialogContent";
 import { useDialog } from "../src/hooks/useDialog";
-import { loadAll } from "../src/redux/slices/movieSlice";
+// import { loadAll } from "../src/redux/slices/movieSlice";
 import { ListElementSkelton } from "../src/components/listElementSkelton";
 import { TokenContext } from "../src/components/auth";
+import {
+  movieApi,
+  useGetMoviesQuery,
+  usePostMovieMutation,
+} from "../src/services/movieService";
+import axios from "axios";
+import { Movie } from "../src/model/Movie.model";
 const Home: NextPage = () => {
-  const movies = useAppSelector((state) => state.movies);
+  // const movies = useAppSelector((state) => state.movies);
   const dispatch = useAppDispatch();
   const token = useContext(TokenContext);
   const [AddDialog, open, close, isOpen] = useDialog(
     AddDialogContent,
     undefined,
-    (name?: string) => {
+    async (name?: string) => {
       if (name) {
         try {
-          dispatch(
-            postMovie({
-              token,
-              movieName: name,
-            })
-          );
+          updateMovie({
+            name,
+            token,
+          });
         } catch (error) {
           console.error(error);
         }
       }
     }
   );
-
-  const completedMovies = (movies.movies || [])
+  const movies = useGetMoviesQuery(token);
+  const [updateMovie, result] = usePostMovieMutation();
+  const completedMovies = (movies.data || [])
     .filter((m) => {
       return !m.hidden;
     })
@@ -42,7 +47,7 @@ const Home: NextPage = () => {
     .map((m, i) => {
       return <ListElement key={i} movie={m}></ListElement>;
     });
-  const uncompletedMovies = (movies.movies || [])
+  const uncompletedMovies = (movies.data || [])
     .filter((m) => {
       return !m.hidden;
     })
@@ -60,7 +65,7 @@ const Home: NextPage = () => {
     });
 
   useEffect(() => {
-    dispatch(loadAll({ token }));
+    // dispatch(loadAll({ token }));
   }, [token]);
 
   const onAddButtonClick = () => {
@@ -84,9 +89,9 @@ const Home: NextPage = () => {
         <span className="relative top-[23px] ">MovieList</span>
       </div>
       <div className="grow mt-16">
-        {movies.movies ? completedMovies : skeletonListElements}
+        {movies.data ? completedMovies : skeletonListElements}
         <p className="text-lg font-bold text-gray-800 mt-2 py-5">視聴済み</p>
-        {movies.movies ? uncompletedMovies : skeletonListElements}
+        {movies.data ? uncompletedMovies : skeletonListElements}
         <AddButton
           className="fixed bottom-7 right-6 z-10"
           onClick={onAddButtonClick}
