@@ -28,7 +28,7 @@ const Home: NextPage = () => {
       }
     }
   );
-  const movies = useGetMoviesQuery();
+  const movies = useGetMoviesQuery(undefined);
   const [updateMovie] = usePostMovieMutation();
   const completedMovies = (movies.data || [])
     .filter((m) => {
