@@ -1,21 +1,18 @@
 import type { NextPage } from "next";
-import React, { useContext, useEffect, useState } from "react";
-import { useAppDispatch, useAppSelector } from "../src/redux/hooks";
+import React, { useEffect } from "react";
 import { ListElement } from "../src/components/listElement";
 import { AddButton } from "../src/components/addButton";
 import { AddDialogContent } from "../src/components/dialogContents/addDialogContent";
 import { useDialog } from "../src/hooks/useDialog";
-// import { loadAll } from "../src/redux/slices/movieSlice";
 import { ListElementSkelton } from "../src/components/listElementSkelton";
 import {
   movieApi,
   useGetMoviesQuery,
   usePostMovieMutation,
 } from "../src/redux/services/movieService";
-import axios from "axios";
-import { Movie } from "../src/model/Movie.model";
 import { useSelector } from "react-redux";
 import { RootState } from "../src/redux/store";
+import { useDispatch } from "react-redux";
 const Home: NextPage = () => {
   const token = useSelector((state: RootState) => state.token.value);
   const [AddDialog, open, close, isOpen] = useDialog(
@@ -31,7 +28,7 @@ const Home: NextPage = () => {
       }
     }
   );
-  const movies = useGetMoviesQuery(undefined);
+  const movies = useGetMoviesQuery();
   const [updateMovie] = usePostMovieMutation();
   const completedMovies = (movies.data || [])
     .filter((m) => {
@@ -67,6 +64,7 @@ const Home: NextPage = () => {
   useEffect(() => {
     movies.refetch();
   }, [token]);
+
   return (
     <div
       className="
@@ -85,6 +83,7 @@ const Home: NextPage = () => {
       </div>
       <div className="grow mt-16">
         {movies.data ? completedMovies : skeletonListElements}
+
         <p className="text-lg font-bold text-gray-800 mt-2 py-5">視聴済み</p>
         {movies.data ? uncompletedMovies : skeletonListElements}
         <AddButton

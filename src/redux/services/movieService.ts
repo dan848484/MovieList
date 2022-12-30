@@ -8,8 +8,9 @@ export const movieApi = createApi({
   reducerPath: "movieApi",
   baseQuery: fetchBaseQuery({
     baseUrl: "/api/proxy/",
-    prepareHeaders: (headers, { getState }) => {
-      const token = (getState() as RootState).token.value;
+    prepareHeaders: (headers, api) => {
+      const token = (api.getState() as RootState).token.value;
+
       if (token) {
         headers.set("authorization", `Bearer ${token}`);
       }
@@ -25,12 +26,12 @@ export const movieApi = createApi({
     postMovie: builder.mutation<Movie, string>({
       query: (name) => ({
         url: `add?name=${name}`,
-
         method: "post",
       }),
       onQueryStarted: async (arg, api) => {
         try {
           const result = await api.queryFulfilled;
+
           api.dispatch(
             movieApi.util.updateQueryData("getMovies", undefined, (draft) => {
               draft.push(result.data);
