@@ -26,9 +26,6 @@ export class Auth {
       UserPoolId: userpoolIds.pool_id,
       ClientId: userpoolIds.client_id,
     };
-
-    // console.log(this.poolData);
-
     this.userPool = new CognitoUserPool(this.poolData);
     this._isSetUp = true;
   }
@@ -79,7 +76,6 @@ export class Auth {
           );
         },
       };
-
       cognitoUser.authenticateUser(authenticationDetails, callbacks);
     });
     return promise;

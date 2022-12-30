@@ -13,32 +13,46 @@ import {
 } from "@mui/material";
 import RemoveCircleOutlineIcon from "@mui/icons-material/RemoveCircleOutline";
 import EditIcon from "@mui/icons-material/Edit";
-import { setMovie, open, close } from "../redux/Slices/dialogSlice";
-import { updateMovie, deleteMovie } from "../redux/Slices/movieSlice";
-import { TokenContext } from "../pages/_app";
-
+// import { updateMovie, deleteMovie } from "../redux/slices/movieSlice";
+import { useDialog } from "../hooks/useDialog";
+import { EditDialogContent } from "./dialogContents/editDialogContent";
+import {
+  useUpdateMovieMutation,
+  useDeleteMovieMutation,
+} from "../redux/services/movieService";
+import { useSelector } from "react-redux";
+import { RootState } from "../redux/store";
 interface Props {
   movie: Movie;
 }
 
 export const ListElement = (props: Props) => {
   const [menuState, setMenuState] = useState(false);
-  const dispatch = useAppDispatch();
-  const token = useContext(TokenContext);
+
+  const [EditDialog, open, close, isOpen] = useDialog(
+    EditDialogContent,
+    props.movie,
+    (value?: string) => {
+      if (value) {
+        updateMovie({
+          id: movie!.id,
+          target: "name",
+          value,
+        });
+      }
+    }
+  );
+  const [updateMovie] = useUpdateMovieMutation();
+  const [deleteMovie] = useDeleteMovieMutation();
 
   let movie = props.movie;
 
   const onMarkClick = () => {
-    dispatch(
-      updateMovie({
-        token,
-        option: {
-          id: movie.id,
-          target: "watched",
-          value: !movie.watched,
-        },
-      })
-    );
+    updateMovie({
+      id: movie.id,
+      target: "watched",
+      value: !movie.watched,
+    });
   };
 
   const onMenuClick = () => {
@@ -46,16 +60,11 @@ export const ListElement = (props: Props) => {
   };
 
   const editMovie = () => {
-    dispatch(setMovie({ movie, kind: "edit" }));
-    dispatch(open("edit"));
+    open();
   };
+
   const removeMovie = async () => {
-    dispatch(
-      deleteMovie({
-        id: movie.id,
-        token,
-      })
-    );
+    deleteMovie(movie.id);
     setMenuState(false);
   };
   return (
@@ -113,6 +122,7 @@ export const ListElement = (props: Props) => {
           </Grow>
         </div>
       </ClickAwayListener>
+      {EditDialog}
     </div>
   );
 };

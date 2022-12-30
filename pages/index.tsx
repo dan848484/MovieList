@@ -1,21 +1,36 @@
 import type { NextPage } from "next";
-import React, { useContext, useEffect, useState } from "react";
-import { useAppDispatch, useAppSelector } from "../redux/hooks";
-import { postMovie } from "../redux/Slices/movieSlice";
-import { ListElement } from "../Components/ListElement";
-import { AddButton } from "../Components/AddButton";
-import { AddDialog } from "../Components/AddDialog";
-import { EditDialog } from "../Components/EditDialog";
-import { loadAll } from "../redux/Slices/movieSlice";
-import MovieOutlinedIcon from "@mui/icons-material/MovieOutlined";
-import { ListElementSkelton } from "../Components/ListElementSkelton";
-import { TokenContext } from "./_app";
-
+import React, { useEffect } from "react";
+import { ListElement } from "../src/components/listElement";
+import { AddButton } from "../src/components/addButton";
+import { AddDialogContent } from "../src/components/dialogContents/addDialogContent";
+import { useDialog } from "../src/hooks/useDialog";
+import { ListElementSkelton } from "../src/components/listElementSkelton";
+import {
+  movieApi,
+  useGetMoviesQuery,
+  usePostMovieMutation,
+} from "../src/redux/services/movieService";
+import { useSelector } from "react-redux";
+import { RootState } from "../src/redux/store";
+import { useDispatch } from "react-redux";
 const Home: NextPage = () => {
-  const movies = useAppSelector((state) => state.movies);
-  const dispatch = useAppDispatch();
-  const token = useContext(TokenContext);
-  const completedMovies = (movies.movies || [])
+  const token = useSelector((state: RootState) => state.token.value);
+  const [AddDialog, open, close, isOpen] = useDialog(
+    AddDialogContent,
+    undefined,
+    async (name?: string) => {
+      if (name) {
+        try {
+          updateMovie(name);
+        } catch (error) {
+          console.error(error);
+        }
+      }
+    }
+  );
+  const movies = useGetMoviesQuery(undefined);
+  const [updateMovie] = usePostMovieMutation();
+  const completedMovies = (movies.data || [])
     .filter((m) => {
       return !m.hidden;
     })
@@ -25,7 +40,7 @@ const Home: NextPage = () => {
     .map((m, i) => {
       return <ListElement key={i} movie={m}></ListElement>;
     });
-  const uncompletedMovies = (movies.movies || [])
+  const uncompletedMovies = (movies.data || [])
     .filter((m) => {
       return !m.hidden;
     })
@@ -42,26 +57,13 @@ const Home: NextPage = () => {
       return <ListElementSkelton key={i}></ListElementSkelton>;
     });
 
-  useEffect(() => {
-    dispatch(loadAll({ token }));
-  }, [token]);
-
-  const [addingDialogState, setAddingDialogState] = useState(false);
   const onAddButtonClick = () => {
-    setAddingDialogState(!addingDialogState);
+    open();
   };
-  const addNewMovie = async (name: string) => {
-    try {
-      dispatch(
-        postMovie({
-          token,
-          movieName: name,
-        })
-      );
-    } catch (error) {
-      console.error(error);
-    }
-  };
+
+  useEffect(() => {
+    movies.refetch();
+  }, [token]);
 
   return (
     <div
@@ -80,22 +82,16 @@ const Home: NextPage = () => {
         <span className="relative top-[23px] ">MovieList</span>
       </div>
       <div className="grow mt-16">
-        {movies.movies ? completedMovies : skeletonListElements}
+        {movies.data ? completedMovies : skeletonListElements}
+
         <p className="text-lg font-bold text-gray-800 mt-2 py-5">視聴済み</p>
-        {movies.movies ? uncompletedMovies : skeletonListElements}
+        {movies.data ? uncompletedMovies : skeletonListElements}
         <AddButton
           className="fixed bottom-7 right-6 z-10"
           onClick={onAddButtonClick}
         ></AddButton>
-        <AddDialog
-          isOpen={addingDialogState}
-          onClick={addNewMovie}
-          onClose={() => {
-            setAddingDialogState(false);
-          }}
-        ></AddDialog>
-        <EditDialog></EditDialog>
       </div>
+      {AddDialog}
     </div>
   );
 };

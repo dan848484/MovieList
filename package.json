@@ -20,6 +20,7 @@
     "@reduxjs/toolkit": "^1.7.1",
     "amazon-cognito-identity-js": "^5.2.8",
     "aws-sdk": "^2.1215.0",
+    "axios": "^1.2.1",
     "dotenv": "^16.0.2",
     "next": "latest",
     "next-http-proxy-middleware": "latest",
