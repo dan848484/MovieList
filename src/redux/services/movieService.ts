@@ -1,7 +1,6 @@
 import { createApi } from "@reduxjs/toolkit/dist/query/react";
 import { fetchBaseQuery } from "@reduxjs/toolkit/dist/query";
 import { Movie } from "../../model/Movie.model";
-import { UpdateOption } from "../slices/movieSlice";
 import { RootState } from "../store";
 
 export const movieApi = createApi({
@@ -10,7 +9,6 @@ export const movieApi = createApi({
     baseUrl: "/api/proxy/",
     prepareHeaders: (headers, api) => {
       const token = (api.getState() as RootState).token.value;
-
       if (token) {
         headers.set("authorization", `Bearer ${token}`);
       }
@@ -20,13 +18,16 @@ export const movieApi = createApi({
   endpoints: (builder) => ({
     getMovies: builder.query<Movie[], unknown>({
       query: () => ({
-        url: "items",
+        url: "movies",
       }),
     }),
     postMovie: builder.mutation<Movie, string>({
       query: (name) => ({
-        url: `add?name=${name}`,
+        url: "movies",
         method: "post",
+        body: {
+          name,
+        },
       }),
       onQueryStarted: async (arg, api) => {
         try {
@@ -42,10 +43,11 @@ export const movieApi = createApi({
         }
       },
     }),
-    updateMovie: builder.mutation<Movie, UpdateOption>({
-      query: (option) => ({
-        url: `update?id=${option.id}&type=${option.target}&value=${option.value}`,
-        method: "post",
+    updateMovie: builder.mutation<Movie, Movie>({
+      query: (movie) => ({
+        url: "movies",
+        method: "put",
+        body: movie,
       }),
       onQueryStarted: async (arg, api) => {
         try {
@@ -67,8 +69,8 @@ export const movieApi = createApi({
     }),
     deleteMovie: builder.mutation<unknown, string>({
       query: (id) => ({
-        url: `delete?id=${id}`,
-        method: "post",
+        url: `movies/${id}`,
+        method: "delete",
       }),
       onQueryStarted: async (arg, api) => {
         try {
