@@ -1,27 +1,16 @@
 import { createTheme, width } from "@mui/system";
-import React, { useContext, useEffect, useState } from "react";
-import { useAppDispatch, useAppSelector } from "../redux/hooks";
+import { useState } from "react";
 import { Movie } from "../model/Movie.model";
-// import { remove, mark, unmark } from "../redux/Slices/movieSlice";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
-import {
-  Button,
-  ButtonBase,
-  ClickAwayListener,
-  Grow,
-  IconButton,
-} from "@mui/material";
+import { Button, ClickAwayListener, Grow, IconButton } from "@mui/material";
 import RemoveCircleOutlineIcon from "@mui/icons-material/RemoveCircleOutline";
 import EditIcon from "@mui/icons-material/Edit";
-// import { updateMovie, deleteMovie } from "../redux/slices/movieSlice";
 import { useDialog } from "../hooks/useDialog";
 import { EditDialogContent } from "./dialogContents/editDialogContent";
 import {
   useUpdateMovieMutation,
   useDeleteMovieMutation,
 } from "../redux/services/movieService";
-import { useSelector } from "react-redux";
-import { RootState } from "../redux/store";
 interface Props {
   movie: Movie;
 }
@@ -35,9 +24,8 @@ export const ListElement = (props: Props) => {
     (value?: string) => {
       if (value) {
         updateMovie({
-          id: movie!.id,
-          target: "name",
-          value,
+          ...movie,
+          name: value,
         });
       }
     }
@@ -49,9 +37,8 @@ export const ListElement = (props: Props) => {
 
   const onMarkClick = () => {
     updateMovie({
-      id: movie.id,
-      target: "watched",
-      value: !movie.watched,
+      ...movie,
+      watched: !movie.watched,
     });
   };
 
