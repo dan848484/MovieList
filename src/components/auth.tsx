@@ -2,9 +2,9 @@ import { CircularProgress } from "@mui/material";
 import { useState, useEffect, FCX, createContext, ReactNode } from "react";
 import { useDispatch } from "react-redux";
 import { Auth } from "../auth/auth";
-import { setToken } from "../redux/slices/tokenSlice";
-import { movieApi, useGetMoviesQuery } from "../redux/services/movieService";
-import { LoginForm } from "./loginForm";
+import { setToken } from "../redux/slices/token-slice";
+import { movieApi, useGetMoviesQuery } from "../redux/services/movie-service";
+import { LoginForm } from "./login-form";
 import { useSelector } from "react-redux";
 import { RootState } from "../redux/store";
 

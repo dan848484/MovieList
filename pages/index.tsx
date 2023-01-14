@@ -1,15 +1,15 @@
 import type { NextPage } from "next";
 import React, { useEffect } from "react";
-import { ListElement } from "../src/components/listElement";
-import { AddButton } from "../src/components/addButton";
-import { AddDialogContent } from "../src/components/dialogContents/addDialogContent";
+import { ListElement } from "../src/components/list-element";
+import { AddButton } from "../src/components/add-button";
+import { AddDialogContent } from "../src/components/dialog-contents/add-dialog-content";
 import { useDialog } from "../src/hooks/useDialog";
-import { ListElementSkelton } from "../src/components/listElementSkelton";
+import { ListElementSkelton } from "../src/components/list-element-skelton";
 import {
   movieApi,
   useGetMoviesQuery,
   usePostMovieMutation,
-} from "../src/redux/services/movieService";
+} from "../src/redux/services/movie-service";
 import { useSelector } from "react-redux";
 import { RootState } from "../src/redux/store";
 import { useDispatch } from "react-redux";

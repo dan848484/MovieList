@@ -8,7 +8,7 @@ import React, {
   useState,
 } from "react";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
-import { Movie } from "../../model/Movie.model";
+import { Movie } from "../../model/movie.model";
 import {
   DialogContent,
   DialogContentProps,

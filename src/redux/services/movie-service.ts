@@ -1,6 +1,6 @@
 import { createApi } from "@reduxjs/toolkit/dist/query/react";
 import { fetchBaseQuery } from "@reduxjs/toolkit/dist/query";
-import { Movie } from "../../model/Movie.model";
+import { Movie } from "../../model/movie.model";
 import { RootState } from "../store";
 
 export const movieApi = createApi({
