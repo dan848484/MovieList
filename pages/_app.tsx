@@ -9,6 +9,7 @@ import { CacheProvider, EmotionCache } from "@emotion/react";
 import theme from "../theme";
 import createEmotionCache from "../createEmotionCache";
 import { AuthComponent } from "../src/components/auth";
+import Layout from "../src/components/layout";
 
 const clientSideEmotionCache = createEmotionCache();
 
@@ -26,7 +27,9 @@ function MyApp({
       <ThemeProvider theme={theme}>
         <Provider store={store}>
           <AuthComponent>
-            <Component {...pageProps} />
+            <Layout>
+              <Component {...pageProps} />
+            </Layout>
           </AuthComponent>
         </Provider>
       </ThemeProvider>

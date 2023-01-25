@@ -70,24 +70,22 @@ const Home: NextPage = () => {
       className="
       px-5
       py-3
+      overflow-scroll
+      h-full
       box-border
       w-screen
-      h-screen
       overflow-x-hidden
       flex
       flex-col
     "
     >
-      <div className="w-full h-20 font-bold text-3xl grow-0 fixed bg-white z-10 top-0 left-0 pl-[26px] shadow-sm">
-        <span className="relative top-[23px] ">MovieList</span>
-      </div>
-      <div className="grow mt-16">
+      <div className="grow shrink">
         {movies.data ? completedMovies : skeletonListElements}
 
         <p className="text-lg font-bold text-gray-800 mt-2 py-5">視聴済み</p>
         {movies.data ? uncompletedMovies : skeletonListElements}
         <AddButton
-          className="fixed bottom-7 right-6 z-10"
+          className="fixed bottom-[80px] right-6 z-10"
           onClick={onAddButtonClick}
         ></AddButton>
       </div>
