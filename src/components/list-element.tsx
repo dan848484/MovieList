@@ -1,6 +1,6 @@
 import { createTheme, width } from "@mui/system";
 import { useState } from "react";
-import { Movie } from "../model/movie.model";
+import { Movie } from "../model/movie-list.model";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import { Button, ClickAwayListener, Grow, IconButton } from "@mui/material";
 import RemoveCircleOutlineIcon from "@mui/icons-material/RemoveCircleOutline";
@@ -11,12 +11,14 @@ import {
   useUpdateMovieMutation,
   useDeleteMovieMutation,
 } from "../redux/services/movie-service";
+import { useWebSocket } from "../hooks/useWebSocket";
 interface Props {
   movie: Movie;
 }
 
 export const ListElement = (props: Props) => {
   const [menuState, setMenuState] = useState(false);
+  const webSocketClient = useWebSocket();
 
   const [EditDialog, open, close, isOpen] = useDialog(
     EditDialogContent,
@@ -35,11 +37,12 @@ export const ListElement = (props: Props) => {
 
   let movie = props.movie;
 
-  const onMarkClick = () => {
-    updateMovie({
+  const onMarkClick = async () => {
+    const updatedMovie = (await updateMovie({
       ...movie,
       watched: !movie.watched,
-    });
+    })) as any;
+    webSocketClient?.send("update", updatedMovie.data);
   };
 
   const onMenuClick = () => {
@@ -51,7 +54,8 @@ export const ListElement = (props: Props) => {
   };
 
   const removeMovie = async () => {
-    deleteMovie(movie.id);
+    const deletedMovie = (await deleteMovie(movie.id)) as any;
+    webSocketClient?.send("delete", movie);
     setMenuState(false);
   };
   return (

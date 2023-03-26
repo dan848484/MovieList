@@ -4,11 +4,12 @@ import { ButtonUnstyled } from "@mui/base";
 import { Add } from "@mui/icons-material";
 import { createTheme } from "@mui/material";
 
-interface Props {
+interface AddButtonProps {
   onClick?: () => void;
+  className: string;
 }
 
-export const AddButton: React.FCX<Props> = (props) => {
+export const AddButton = (props: AddButtonProps) => {
   const theme = createTheme({
     components: {
       MuiButtonBase: {

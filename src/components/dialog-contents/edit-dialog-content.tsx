@@ -1,14 +1,8 @@
 import { Button, DialogTitle, TextField, ThemeProvider } from "@mui/material";
 import { createTheme } from "@mui/system";
-import React, {
-  ChangeEvent,
-  FCX,
-  useContext,
-  useEffect,
-  useState,
-} from "react";
-import { useAppDispatch, useAppSelector } from "../../redux/hooks";
-import { Movie } from "../../model/movie.model";
+import React, { ChangeEvent, useContext, useEffect, useState } from "react";
+import { useAppDispatch, useAppSelector } from "../../hooks/redux-hooks";
+import { Movie } from "../../model/movie-list.model";
 import {
   DialogContent,
   DialogContentProps,

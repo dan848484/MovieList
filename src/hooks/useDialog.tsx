@@ -1,13 +1,6 @@
 import { Dialog } from "@mui/material";
 import { useMemo } from "react";
-import {
-  FC,
-  PropsWithChildren,
-  ReactElement,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import { FC, useState } from "react";
 
 type UseDialog<T = any> = (
   component: FC<DialogContentProps<T>>,

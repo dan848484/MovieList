@@ -13,15 +13,21 @@ import {
 import { useSelector } from "react-redux";
 import { RootState } from "../src/redux/store";
 import { useDispatch } from "react-redux";
+import { useWebSocket } from "../src/hooks/useWebSocket";
+import { Movie } from "../src/model/movie-list.model";
 const Home: NextPage = () => {
-  const token = useSelector((state: RootState) => state.token.value);
+  const webSocketClient = useWebSocket();
+  const token = useSelector((state: RootState) => state.token.token);
   const [AddDialog, open, close, isOpen] = useDialog(
     AddDialogContent,
     undefined,
     async (name?: string) => {
       if (name) {
         try {
-          updateMovie(name);
+          let movie = (await postMovie(name)) as any;
+          if (movie.data) {
+            webSocketClient!.send("add", movie.data);
+          }
         } catch (error) {
           console.error(error);
         }
@@ -29,7 +35,7 @@ const Home: NextPage = () => {
     }
   );
   const movies = useGetMoviesQuery(undefined);
-  const [updateMovie] = usePostMovieMutation();
+  const [postMovie] = usePostMovieMutation();
   const completedMovies = (movies.data || [])
     .filter((m) => {
       return !m.hidden;
@@ -64,6 +70,21 @@ const Home: NextPage = () => {
   useEffect(() => {
     movies.refetch();
   }, [token]);
+
+  useEffect(() => {
+    webSocketClient?.subscribe((message) => {
+      console.log(message);
+
+      switch (message.action) {
+        case "update":
+          break;
+        case "delete":
+          break;
+        case "add":
+          break;
+      }
+    });
+  }, [webSocketClient]);
 
   return (
     <div

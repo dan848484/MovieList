@@ -1,18 +1,30 @@
 import { createApi } from "@reduxjs/toolkit/dist/query/react";
 import { fetchBaseQuery } from "@reduxjs/toolkit/dist/query";
-import { Movie } from "../../model/movie.model";
+import { Movie } from "../../model/movie-list.model";
 import { RootState } from "../store";
+import { MaybePromise } from "@reduxjs/toolkit/dist/query/tsHelpers";
 
 export const movieApi = createApi({
   reducerPath: "movieApi",
   baseQuery: fetchBaseQuery({
     baseUrl: "/api/proxy/",
     prepareHeaders: (headers, api) => {
-      const token = (api.getState() as RootState).token.value;
-      if (token) {
-        headers.set("authorization", `Bearer ${token}`);
-      }
-      return headers;
+      const promise = new Promise((resolve, reject) => {
+        const token = (api.getState() as RootState).token.token;
+        if (token) {
+          headers.set("Authorization", `Bearer ${token}`);
+          resolve(headers);
+        } else {
+          //トークンが取得できなかったらとりえあず2s後にトライ
+          setTimeout(() => {
+            const token = (api.getState() as RootState).token.token;
+            if (!token) reject();
+            headers.set("Authorization", `Bearer ${token}`);
+            resolve(headers);
+          }, 2000);
+        }
+      });
+      return promise as MaybePromise<Headers>;
     },
   }),
   endpoints: (builder) => ({
@@ -32,7 +44,6 @@ export const movieApi = createApi({
       onQueryStarted: async (arg, api) => {
         try {
           const result = await api.queryFulfilled;
-
           api.dispatch(
             movieApi.util.updateQueryData("getMovies", undefined, (draft) => {
               draft.push(result.data);

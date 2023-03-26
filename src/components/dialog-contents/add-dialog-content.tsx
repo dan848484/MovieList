@@ -12,7 +12,6 @@ export const AddDialogContent = (props: DialogContentProps<string>) => {
   const [name, setName] = useState("");
   const [inputError, setInputError] = useState(false);
   const [helperText, setHelperText] = useState("");
-  const [sending, setSending] = useState(false);
 
   const onChange = (event: ChangeEvent<HTMLInputElement>) => {
     setName(event.target.value);
