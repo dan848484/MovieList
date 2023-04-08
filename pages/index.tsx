@@ -7,8 +7,10 @@ import { useDialog } from "../src/hooks/useDialog";
 import { ListElementSkelton } from "../src/components/list-element-skelton";
 import {
   movieApi,
+  useDeleteMovieMutation,
   useGetMoviesQuery,
   usePostMovieMutation,
+  useUpdateMovieMutation,
 } from "../src/redux/services/movie-service";
 import { useSelector } from "react-redux";
 import { RootState } from "../src/redux/store";
@@ -34,11 +36,14 @@ const Home: NextPage = () => {
       }
     }
   );
+  const dispatch = useDispatch();
   const movies = useGetMoviesQuery(undefined);
   const [postMovie] = usePostMovieMutation();
+  const [updateMoive] = useUpdateMovieMutation();
+  const [deleteMovie] = useDeleteMovieMutation();
   const completedMovies = (movies.data || [])
     .filter((m) => {
-      return !m.hidden;
+      return !m?.hidden;
     })
     .filter((m) => {
       return !m.watched;
@@ -72,15 +77,42 @@ const Home: NextPage = () => {
   }, [token]);
 
   useEffect(() => {
-    webSocketClient?.subscribe((message) => {
-      console.log(message);
-
-      switch (message.action) {
+    webSocketClient?.subscribe((websocketMessage) => {
+      const movie = websocketMessage.movie;
+      switch (websocketMessage.messageType) {
         case "update":
+          let action = movieApi.util.updateQueryData(
+            "getMovies",
+            undefined,
+            (cache) => {
+              const index = cache.findIndex((m) => m.id === movie.id);
+              if (!index) return;
+              Object.assign(cache[index], movie);
+            }
+          );
+          dispatch(action as any);
           break;
         case "delete":
+          action = movieApi.util.updateQueryData(
+            "getMovies",
+            undefined,
+            (cache) => {
+              const index = cache.findIndex((m) => m.id === movie.id);
+              if (!index) return;
+              cache.splice(index, 1);
+            }
+          );
+          dispatch(action as any);
           break;
         case "add":
+          action = movieApi.util.updateQueryData(
+            "getMovies",
+            undefined,
+            (cache) => {
+              cache.push(movie);
+            }
+          );
+          dispatch(action as any);
           break;
       }
     });

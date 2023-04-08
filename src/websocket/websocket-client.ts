@@ -5,22 +5,18 @@ import {
   WebSocketMessage,
 } from "../model/movie-list.model";
 
-type WebSocketSubscriber = (message: WebSocketMessage) => void;
+type WebSocketSubscriber = (message: WebSocketMessage["message"]) => void;
 
 export class WebSocketClient {
   readonly url: string;
   private websocket: ReconnectingWebSocket;
   subscriber?: WebSocketSubscriber;
-  randomId = Math.floor(Math.random() * 100);
   constructor(url: string) {
     this.url = url;
     this.websocket = new ReconnectingWebSocket(url);
-    this.websocket.addEventListener(
-      "message",
-      (event: MessageEvent<WebSocketMessage>) => {
-        this.subscriber && this.subscriber(event.data);
-      }
-    );
+    this.websocket.addEventListener("message", (event) => {
+      this.subscriber && this.subscriber(JSON.parse(event.data));
+    });
   }
 
   subscribe(subscriber: WebSocketSubscriber) {
@@ -45,12 +41,11 @@ export class WebSocketClient {
         movie,
       },
     };
-
-    const stringfiedData = {
-      action: data.action,
-      message: JSON.stringify(data.message),
-    };
-
-    this.websocket.send(JSON.stringify(stringfiedData));
+    this.websocket.send(
+      JSON.stringify({
+        ...data,
+        message: JSON.stringify(data.message),
+      })
+    );
   }
 }

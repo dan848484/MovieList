@@ -23,12 +23,15 @@ export const ListElement = (props: Props) => {
   const [EditDialog, open, close, isOpen] = useDialog(
     EditDialogContent,
     props.movie,
-    (value?: string) => {
+    async (value?: string) => {
       if (value) {
-        updateMovie({
+        const updatedMovie = (await updateMovie({
           ...movie,
           name: value,
-        });
+        })) as any;
+        if (updatedMovie.data) {
+          webSocketClient?.send("update", updatedMovie.data);
+        }
       }
     }
   );
@@ -42,6 +45,7 @@ export const ListElement = (props: Props) => {
       ...movie,
       watched: !movie.watched,
     })) as any;
+    debugger;
     webSocketClient?.send("update", updatedMovie.data);
   };
 
