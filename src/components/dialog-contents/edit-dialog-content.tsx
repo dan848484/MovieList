@@ -1,13 +1,7 @@
 import { Button, DialogTitle, TextField, ThemeProvider } from "@mui/material";
-import { createTheme } from "@mui/system";
-import React, { ChangeEvent, useContext, useEffect, useState } from "react";
-import { useAppDispatch, useAppSelector } from "../../hooks/redux-hooks";
+import { ChangeEvent, useContext, useEffect, useState } from "react";
 import { Movie } from "../../model/movie-list.model";
-import {
-  DialogContent,
-  DialogContentProps,
-  useDialog,
-} from "../../hooks/useDialog";
+import { DialogContentProps } from "../../hooks/useDialog";
 
 export const EditDialogContent = (props: DialogContentProps<Movie>) => {
   const [name, setName] = useState("");
