@@ -1,10 +1,10 @@
 import { CircularProgress } from "@mui/material";
-import { useState, useEffect, FCX, createContext, ReactNode } from "react";
+import { useState, useEffect, createContext, ReactNode, FC } from "react";
 import { useDispatch } from "react-redux";
 import { Auth } from "../auth/auth";
-import { setToken } from "../redux/slices/tokenSlice";
-import { movieApi, useGetMoviesQuery } from "../redux/services/movieService";
-import { LoginForm } from "./loginForm";
+import { setToken, TokenState } from "../redux/slices/token-slice";
+import { movieApi, useGetMoviesQuery } from "../redux/services/movie-service";
+import { LoginForm } from "./login-form";
 import { useSelector } from "react-redux";
 import { RootState } from "../redux/store";
 
@@ -12,7 +12,7 @@ interface AuthComponentProps {
   children?: ReactNode;
 }
 
-export const AuthComponent: FCX<AuthComponentProps> = (props) => {
+export const AuthComponent: FC<AuthComponentProps> = (props) => {
   const [isLoading, setIsLoading] = useState(true);
   const [loginRequired, setLoginRequired] = useState(true);
   const [auth] = useState(new Auth());
@@ -21,8 +21,13 @@ export const AuthComponent: FCX<AuthComponentProps> = (props) => {
   const login = async () => {
     const session = await auth.isLogined();
     setLoginRequired(false);
-    const newToken = session.getIdToken().getJwtToken();
-    dispatch(setToken(newToken));
+    const token = session.getIdToken().getJwtToken();
+    const expire = session.getIdToken().getExpiration() + new Date().getTime();
+    const tokenState: TokenState = {
+      token,
+      expire,
+    };
+    dispatch(setToken(tokenState));
   };
 
   /**

@@ -14,7 +14,7 @@ export interface Props {
   onComplete: () => void;
 }
 
-export const LoginForm: React.FCX<Props> = (props) => {
+export const LoginForm: React.FC<Props> = (props) => {
   const {
     register,
     handleSubmit,

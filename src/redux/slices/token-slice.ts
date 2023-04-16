@@ -1,17 +1,19 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
-interface TokenState {
-  value: string;
+export interface TokenState {
+  token: string;
+  expire?: number;
 }
 
-const initialState: TokenState = { value: "" };
+const initialState: TokenState = { token: "" };
 
 export const tokenSlice = createSlice({
   name: "token",
   initialState: initialState,
   reducers: {
-    setToken: (state, action: PayloadAction<string>) => {
-      state.value = action.payload;
+    setToken: (state, action: PayloadAction<TokenState>) => {
+      state.token = action.payload.token;
+      state.expire = action.payload.expire;
     },
   },
 });

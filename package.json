@@ -14,7 +14,7 @@
     "@emotion/react": "latest",
     "@emotion/server": "latest",
     "@emotion/styled": "latest",
-    "@mui/icons-material": "latest",
+    "@mui/icons-material": "^5.11.0",
     "@mui/lab": "latest",
     "@mui/material": "latest",
     "@reduxjs/toolkit": "^1.7.1",
@@ -29,6 +29,7 @@
     "react-hook-form": "^7.35.0",
     "react-redux": "^8.0.2",
     "react-router": "^6.4.0",
+    "reconnecting-websocket": "^4.4.0",
     "rxjs": "^7.5.5",
     "styled-components": "latest"
   },

@@ -4,6 +4,19 @@ body {
   margin: 0;
 }
 
+html,
+body,
+#__next {
+  height: 100%;
+}
+
+.MuiBottomNavigationAction-label {
+  font-size: 8px;
+}
+
+.MuiBottomNavigationAction-label.Mui-selected {
+  font-size: 8px;
+}
 @tailwind components;
 @tailwind utilities;
 @tailwind base;

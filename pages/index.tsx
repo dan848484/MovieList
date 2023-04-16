@@ -1,38 +1,49 @@
 import type { NextPage } from "next";
 import React, { useEffect } from "react";
-import { ListElement } from "../src/components/listElement";
-import { AddButton } from "../src/components/addButton";
-import { AddDialogContent } from "../src/components/dialogContents/addDialogContent";
+import { ListElement } from "../src/components/list-element";
+import { AddButton } from "../src/components/add-button";
+import { AddDialogContent } from "../src/components/dialog-contents/add-dialog-content";
 import { useDialog } from "../src/hooks/useDialog";
-import { ListElementSkelton } from "../src/components/listElementSkelton";
+import { ListElementSkelton } from "../src/components/list-element-skelton";
 import {
   movieApi,
+  useDeleteMovieMutation,
   useGetMoviesQuery,
   usePostMovieMutation,
-} from "../src/redux/services/movieService";
+  useUpdateMovieMutation,
+} from "../src/redux/services/movie-service";
 import { useSelector } from "react-redux";
 import { RootState } from "../src/redux/store";
 import { useDispatch } from "react-redux";
+import { useWebSocket } from "../src/hooks/useWebSocket";
+import { Movie } from "../src/model/movie-list.model";
 const Home: NextPage = () => {
-  const token = useSelector((state: RootState) => state.token.value);
+  const webSocketClient = useWebSocket();
+  const token = useSelector((state: RootState) => state.token.token);
   const [AddDialog, open, close, isOpen] = useDialog(
     AddDialogContent,
     undefined,
     async (name?: string) => {
       if (name) {
         try {
-          updateMovie(name);
+          let movie = (await postMovie(name)) as any;
+          if (movie.data) {
+            webSocketClient!.send("add", movie.data);
+          }
         } catch (error) {
           console.error(error);
         }
       }
     }
   );
+  const dispatch = useDispatch();
   const movies = useGetMoviesQuery(undefined);
-  const [updateMovie] = usePostMovieMutation();
+  const [postMovie] = usePostMovieMutation();
+  const [updateMoive] = useUpdateMovieMutation();
+  const [deleteMovie] = useDeleteMovieMutation();
   const completedMovies = (movies.data || [])
     .filter((m) => {
-      return !m.hidden;
+      return !m?.hidden;
     })
     .filter((m) => {
       return !m.watched;
@@ -65,29 +76,69 @@ const Home: NextPage = () => {
     movies.refetch();
   }, [token]);
 
+  useEffect(() => {
+    webSocketClient?.subscribe((websocketMessage) => {
+      const movie = websocketMessage.movie;
+      switch (websocketMessage.messageType) {
+        case "update":
+          let action = movieApi.util.updateQueryData(
+            "getMovies",
+            undefined,
+            (cache) => {
+              const index = cache.findIndex((m) => m.id === movie.id);
+              if (!index) return;
+              Object.assign(cache[index], movie);
+            }
+          );
+          dispatch(action as any);
+          break;
+        case "delete":
+          action = movieApi.util.updateQueryData(
+            "getMovies",
+            undefined,
+            (cache) => {
+              const index = cache.findIndex((m) => m.id === movie.id);
+              if (!index) return;
+              cache.splice(index, 1);
+            }
+          );
+          dispatch(action as any);
+          break;
+        case "add":
+          action = movieApi.util.updateQueryData(
+            "getMovies",
+            undefined,
+            (cache) => {
+              cache.push(movie);
+            }
+          );
+          dispatch(action as any);
+          break;
+      }
+    });
+  }, [webSocketClient]);
+
   return (
     <div
       className="
       px-5
       py-3
+      overflow-scroll
+      h-full
       box-border
       w-screen
-      h-screen
       overflow-x-hidden
       flex
       flex-col
     "
     >
-      <div className="w-full h-20 font-bold text-3xl grow-0 fixed bg-white z-10 top-0 left-0 pl-[26px] shadow-sm">
-        <span className="relative top-[23px] ">MovieList</span>
-      </div>
-      <div className="grow mt-16">
+      <div className="grow shrink">
         {movies.data ? completedMovies : skeletonListElements}
 
         <p className="text-lg font-bold text-gray-800 mt-2 py-5">視聴済み</p>
         {movies.data ? uncompletedMovies : skeletonListElements}
         <AddButton
-          className="fixed bottom-7 right-6 z-10"
+          className="fixed bottom-[80px] right-6 z-10"
           onClick={onAddButtonClick}
         ></AddButton>
       </div>

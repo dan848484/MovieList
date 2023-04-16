@@ -1,32 +1,37 @@
 import { createTheme, width } from "@mui/system";
 import { useState } from "react";
-import { Movie } from "../model/Movie.model";
+import { Movie } from "../model/movie-list.model";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import { Button, ClickAwayListener, Grow, IconButton } from "@mui/material";
 import RemoveCircleOutlineIcon from "@mui/icons-material/RemoveCircleOutline";
 import EditIcon from "@mui/icons-material/Edit";
 import { useDialog } from "../hooks/useDialog";
-import { EditDialogContent } from "./dialogContents/editDialogContent";
+import { EditDialogContent } from "./dialog-contents/edit-dialog-content";
 import {
   useUpdateMovieMutation,
   useDeleteMovieMutation,
-} from "../redux/services/movieService";
+} from "../redux/services/movie-service";
+import { useWebSocket } from "../hooks/useWebSocket";
 interface Props {
   movie: Movie;
 }
 
 export const ListElement = (props: Props) => {
   const [menuState, setMenuState] = useState(false);
+  const webSocketClient = useWebSocket();
 
   const [EditDialog, open, close, isOpen] = useDialog(
     EditDialogContent,
     props.movie,
-    (value?: string) => {
+    async (value?: string) => {
       if (value) {
-        updateMovie({
+        const updatedMovie = (await updateMovie({
           ...movie,
           name: value,
-        });
+        })) as any;
+        if (updatedMovie.data) {
+          webSocketClient?.send("update", updatedMovie.data);
+        }
       }
     }
   );
@@ -35,11 +40,13 @@ export const ListElement = (props: Props) => {
 
   let movie = props.movie;
 
-  const onMarkClick = () => {
-    updateMovie({
+  const onMarkClick = async () => {
+    const updatedMovie = (await updateMovie({
       ...movie,
       watched: !movie.watched,
-    });
+    })) as any;
+    debugger;
+    webSocketClient?.send("update", updatedMovie.data);
   };
 
   const onMenuClick = () => {
@@ -51,7 +58,8 @@ export const ListElement = (props: Props) => {
   };
 
   const removeMovie = async () => {
-    deleteMovie(movie.id);
+    const deletedMovie = (await deleteMovie(movie.id)) as any;
+    webSocketClient?.send("delete", movie);
     setMenuState(false);
   };
   return (

@@ -1,7 +1,6 @@
-import { FCX } from "react";
 import { Skeleton } from "@mui/material";
 
-export const ListElementSkelton: FCX = () => {
+export const ListElementSkelton = () => {
   return (
     <Skeleton
       variant="rectangular"
