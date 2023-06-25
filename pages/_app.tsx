@@ -8,8 +8,8 @@ import { ThemeProvider } from "@mui/material";
 import { CacheProvider, EmotionCache } from "@emotion/react";
 import theme from "../theme";
 import createEmotionCache from "../createEmotionCache";
-import { AuthComponent } from "../src/components/auth";
-import Layout from "../src/components/layout";
+import { AuthComponent } from "../src/components/templates/auth/auth";
+import Layout from "../src/components/templates/layout/layout";
 import { WebSocketProvider } from "../src/providers/websocket.provider";
 
 const clientSideEmotionCache = createEmotionCache();

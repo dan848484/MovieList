@@ -1,17 +1,17 @@
 import { createTheme, width } from "@mui/system";
 import { useState } from "react";
-import { Movie } from "../model/movie-list.model";
+import { Movie } from "../../../model/movie-list.model";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import { Button, ClickAwayListener, Grow, IconButton } from "@mui/material";
 import RemoveCircleOutlineIcon from "@mui/icons-material/RemoveCircleOutline";
 import EditIcon from "@mui/icons-material/Edit";
-import { useDialog } from "../hooks/useDialog";
-import { EditDialogContent } from "./dialog-contents/edit-dialog-content";
+import { useDialog } from "../../../hooks/useDialog";
+import { EditDialogContent } from "../../organisms/edit-dialog-content/edit-dialog-content";
 import {
   useUpdateMovieMutation,
   useDeleteMovieMutation,
-} from "../redux/services/movie-service";
-import { useWebSocket } from "../hooks/useWebSocket";
+} from "../../../redux/services/movie-service";
+import { useWebSocket } from "../../../hooks/useWebSocket";
 interface Props {
   movie: Movie;
 }

@@ -1,12 +1,15 @@
 import { CircularProgress } from "@mui/material";
 import { useState, useEffect, createContext, ReactNode, FC } from "react";
 import { useDispatch } from "react-redux";
-import { Auth } from "../auth/auth";
-import { setToken, TokenState } from "../redux/slices/token-slice";
-import { movieApi, useGetMoviesQuery } from "../redux/services/movie-service";
-import { LoginForm } from "./login-form";
+import { Auth } from "../../../auth/auth";
+import { setToken, TokenState } from "../../../redux/slices/token-slice";
+import {
+  movieApi,
+  useGetMoviesQuery,
+} from "../../../redux/services/movie-service";
+import { LoginForm } from "../../organisms/login-form/login-form";
 import { useSelector } from "react-redux";
-import { RootState } from "../redux/store";
+import { RootState } from "../../../redux/store";
 
 interface AuthComponentProps {
   children?: ReactNode;
