@@ -1,9 +1,11 @@
-import { ChangeEvent, FormEvent, useState } from "react";
+import { ChangeEvent, FormEvent, useEffect, useState } from "react";
 import style from "./password-change-form.module.scss";
 import { Button, FormControl, TextField } from "@mui/material";
+import { LoadingButton } from "@mui/lab";
 
 export interface PasswordFormProps {
   onConfirmed: (password: string) => void;
+  isLoading: boolean;
 }
 
 export const PasswordChangeForm = (props: PasswordFormProps) => {
@@ -11,9 +13,27 @@ export const PasswordChangeForm = (props: PasswordFormProps) => {
   const [reinputedPassword, setReinputedPassword] = useState("");
   const [isMatched, setIsMatched] = useState(false);
   const [helperTexts, setHelperTexts] = useState(["", ""]);
+  const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    setIsLoading(props.isLoading);
+  }, [props.isLoading]);
+
   const onSubmit = (event: FormEvent) => {
     event.preventDefault();
-    console.log(inputedPassword, reinputedPassword);
+    if (
+      isMatched &&
+      inputedPassword.length > 0 &&
+      reinputedPassword.length > 0
+    ) {
+      props.onConfirmed(inputedPassword);
+    } else {
+      setIsMatched(false);
+      setHelperTexts([
+        inputedPassword.length ? "" : "入力してください。",
+        reinputedPassword.length ? "" : "入力してください。",
+      ]);
+    }
   };
   const validateInputs = (
     inputedPassword: string,
@@ -50,6 +70,7 @@ export const PasswordChangeForm = (props: PasswordFormProps) => {
           type="password"
           error={!isMatched}
           helperText={helperTexts[0]}
+          disabled={isLoading}
         />
         <TextField
           className={style.textField}
@@ -64,12 +85,18 @@ export const PasswordChangeForm = (props: PasswordFormProps) => {
           error={!isMatched}
           type="password"
           helperText={helperTexts[1]}
+          disabled={isLoading}
         />
       </div>
 
-      <Button variant="contained" type="submit" className={style.submitButton}>
+      <LoadingButton
+        variant="contained"
+        type="submit"
+        className={style.submitButton}
+        loading={isLoading}
+      >
         変更
-      </Button>
+      </LoadingButton>
     </FormControl>
   );
 };
