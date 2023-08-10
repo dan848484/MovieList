@@ -8,7 +8,7 @@ import { ThemeProvider } from "@mui/material";
 import { CacheProvider, EmotionCache } from "@emotion/react";
 import theme from "../theme";
 import createEmotionCache from "../createEmotionCache";
-import { AuthComponent } from "../src/components/templates/auth/auth";
+import { AuthGuardComponent } from "../src/components/templates/auth/auth";
 import Layout from "../src/components/templates/layout/layout";
 import { WebSocketProvider } from "../src/providers/websocket.provider";
 
@@ -31,13 +31,13 @@ function MyApp({
     <CacheProvider value={emotionCache!}>
       <ThemeProvider theme={theme}>
         <Provider store={store}>
-          <AuthComponent>
+          <AuthGuardComponent>
             <WebSocketProvider websocketUrl={props.websocketUrl}>
               <Layout>
                 <Component {...pageProps} />
               </Layout>
             </WebSocketProvider>
-          </AuthComponent>
+          </AuthGuardComponent>
         </Provider>
       </ThemeProvider>
     </CacheProvider>

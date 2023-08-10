@@ -1,14 +1,14 @@
 import { ChangeEvent, FormEvent, useEffect, useState } from "react";
-import style from "./password-change-form.module.scss";
+import style from "./new-password-form.module.scss";
 import { Button, FormControl, TextField } from "@mui/material";
 import { LoadingButton } from "@mui/lab";
 
-export interface PasswordFormProps {
+export interface NewPasswordFormProps {
   onConfirmed: (password: string) => void;
   isLoading: boolean;
 }
 
-export const PasswordChangeForm = (props: PasswordFormProps) => {
+export const NewPasswordForm = (props: NewPasswordFormProps) => {
   const [inputedPassword, setInputedPassword] = useState("");
   const [reinputedPassword, setReinputedPassword] = useState("");
   const [isMatched, setIsMatched] = useState(false);

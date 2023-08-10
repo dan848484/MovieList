@@ -1,5 +1,5 @@
 import React from "react";
-import { Auth } from "../../../auth/auth";
+import { AuthClient } from "../../../auth-client/authClient";
 import { useForm, Controller } from "react-hook-form";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
@@ -10,7 +10,7 @@ type FormInputs = {
 };
 
 export interface Props {
-  auth: Auth;
+  auth: AuthClient;
   onComplete: () => void;
 }
 
