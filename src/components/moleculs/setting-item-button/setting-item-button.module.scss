@@ -1,0 +1,6 @@
+.container {
+  &:hover {
+    background-color: rgb(209 213 219);
+    transition: all 400ms ease;
+  }
+}

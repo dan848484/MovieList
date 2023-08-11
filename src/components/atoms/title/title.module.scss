@@ -1,0 +1,38 @@
+.titleWithButtonContainer {
+  display: flex;
+  width: 100%;
+  position: relative;
+  height: 35px;
+  & > * {
+    width: 0;
+  }
+  .leftArea {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    flex-grow: 1;
+    flex-shrink: 1;
+    .backButtonText {
+      white-space: nowrap; /* ここから */
+      overflow: hidden;
+      text-overflow: ellipsis; /* ここまでが省略表示のためのCSS */
+    }
+  }
+  .centerArea {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 20px;
+    flex-grow: 2;
+    flex-shrink: 2;
+    text-wrap: nowrap;
+  }
+  .rightArea {
+    flex-grow: 1;
+    flex-shrink: 1;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+  }
+}

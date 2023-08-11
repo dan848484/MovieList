@@ -12,7 +12,7 @@ export interface Movie extends IMovie {
   isBeingUpdated: boolean;
 }
 
-export interface UserInfo {
+export interface User {
   cognitoUser: CognitoUser;
   session: CognitoUserSession;
 }

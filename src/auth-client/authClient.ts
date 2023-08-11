@@ -7,13 +7,20 @@ import {
   ICognitoUserPoolData,
 } from "amazon-cognito-identity-js";
 import { CognitoIdentityCredentials, config } from "aws-sdk";
+import { User } from "../model/movie-list.model";
 
 type UserAttributes = { email: string; name: string };
 
-export class Auth {
+export class AuthClient {
   private userPool: CognitoUserPool | null = null;
   private poolData: ICognitoUserPoolData | null = null;
   private _isSetUp = false;
+  private _user?: User;
+
+  get user() {
+    return this._user;
+  }
+
   constructor() {}
 
   get isSetUp() {
@@ -35,29 +42,33 @@ export class Auth {
    * @param name ユーザー名
    * @param password パスワード
    */
-  async login(name: string, password: string): Promise<CognitoUserSession> {
+  async login(name?: string, password?: string): Promise<CognitoUserSession> {
+    if (!name || !password) return this.getCognitoUserSession();
     const promise = new Promise<CognitoUserSession>((resolve, reject) => {
       if (!this.isSetUp) {
         reject(new AuthIsNotSetUpError());
         return;
       }
       let authenticationData = {
-        Username: name,
-        Password: password,
+        Username: name!,
+        Password: password!,
       };
       config.region = "ap-northeast-1";
       let authenticationDetails = new AuthenticationDetails(authenticationData);
 
       let userData = {
-        Username: name,
+        Username: name!,
         Pool: this.userPool!,
       };
 
       let cognitoUser = new CognitoUser(userData);
-
       const callbacks = {
         onSuccess: (result: CognitoUserSession) => {
-          console.log("ログイン成功");
+          console.log("ログイン成功", cognitoUser.getUsername());
+          this._user = {
+            cognitoUser,
+            session: result,
+          };
           resolve(result);
         },
         onFailure: (result: any) => {
@@ -81,11 +92,7 @@ export class Auth {
     return promise;
   }
 
-  /**
-   * ログイン状態であればセッションオブジェクトを返します。
-   * @returns
-   */
-  async isLogined(): Promise<CognitoUserSession> {
+  async getCognitoUserSession(): Promise<CognitoUserSession> {
     const promsie = new Promise<CognitoUserSession>((resolve, reject) => {
       if (!this.isSetUp) {
         reject(new AuthIsNotSetUpError());
@@ -101,11 +108,32 @@ export class Auth {
           reject((error as Error).message);
         } else {
           const session: CognitoUserSession = data;
+          this._user = {
+            cognitoUser: currentUser,
+            session,
+          };
           resolve(session);
         }
       });
     });
     return promsie;
+  }
+
+  async changePassword(oldPassword: string, newPassword: string) {
+    if (!this._user) throw new Error("ユーザー情報を取得できませんでした。");
+    return new Promise<string>((resolve, reject) => {
+      this._user!.cognitoUser.changePassword(
+        oldPassword,
+        newPassword,
+        (error, result) => {
+          if (error) {
+            reject(error);
+          } else {
+            resolve(result!);
+          }
+        }
+      );
+    });
   }
 }
 

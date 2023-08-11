@@ -1,10 +1,10 @@
 import type { NextPage } from "next";
 import React, { useEffect } from "react";
-import { ListElement } from "../src/components/list-element";
-import { AddButton } from "../src/components/add-button";
-import { AddDialogContent } from "../src/components/dialog-contents/add-dialog-content";
+import { ListElement } from "../src/components/moleculs/list-element/list-element";
+import { AddButton } from "../src/components/atoms/add-button/add-button";
+import { AddDialogContent } from "../src/components/organisms/add-dialog-content/add-dialog-content";
 import { useDialog } from "../src/hooks/useDialog";
-import { ListElementSkelton } from "../src/components/list-element-skelton";
+import { ListElementSkelton } from "../src/components/moleculs/list-element-skelton/list-element-skelton";
 import {
   movieApi,
   useDeleteMovieMutation,
@@ -16,7 +16,6 @@ import { useSelector } from "react-redux";
 import { RootState } from "../src/redux/store";
 import { useDispatch } from "react-redux";
 import { useWebSocket } from "../src/hooks/useWebSocket";
-import { Movie } from "../src/model/movie-list.model";
 const Home: NextPage = () => {
   const webSocketClient = useWebSocket();
   const token = useSelector((state: RootState) => state.token.token);
