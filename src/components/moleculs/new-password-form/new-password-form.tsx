@@ -1,4 +1,4 @@
-import { ChangeEvent, FormEvent, useEffect, useState } from "react";
+import { ChangeEvent, FormEvent, useEffect, useRef, useState } from "react";
 import style from "./new-password-form.module.scss";
 import { Button, FormControl, TextField } from "@mui/material";
 import { LoadingButton } from "@mui/lab";
@@ -14,10 +14,20 @@ export const NewPasswordForm = (props: NewPasswordFormProps) => {
   const [isMatched, setIsMatched] = useState(false);
   const [helperTexts, setHelperTexts] = useState(["", ""]);
   const [isLoading, setIsLoading] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setIsLoading(props.isLoading);
   }, [props.isLoading]);
+
+  useEffect(() => {
+    if (!containerRef.current) return;
+    const frames = [{ opacity: 0 }, { opacity: 1 }];
+    containerRef.current.animate(frames, {
+      duration: 300,
+      easing: "ease-in",
+    });
+  }, []);
 
   const onSubmit = (event: FormEvent) => {
     event.preventDefault();
@@ -50,53 +60,55 @@ export const NewPasswordForm = (props: NewPasswordFormProps) => {
     setIsMatched(true);
   };
   return (
-    <FormControl
-      component="form"
-      onSubmit={onSubmit}
-      required={true}
-      className={style.form}
-    >
-      <div className={style.textFieldsArea}>
-        <TextField
-          className={style.textField}
-          label="新しいパスワードを入力"
-          variant="outlined"
-          margin="dense"
-          value={inputedPassword}
-          onChange={(event: ChangeEvent<HTMLInputElement>) => {
-            setInputedPassword(event.target.value);
-            validateInputs(event.target.value, reinputedPassword);
-          }}
-          type="password"
-          error={!isMatched}
-          helperText={helperTexts[0]}
-          disabled={isLoading}
-        />
-        <TextField
-          className={style.textField}
-          label="パスワードを再入力"
-          variant="outlined"
-          margin="dense"
-          value={reinputedPassword}
-          onChange={(event: ChangeEvent<HTMLInputElement>) => {
-            setReinputedPassword(event.target.value);
-            validateInputs(inputedPassword, event.target.value);
-          }}
-          error={!isMatched}
-          type="password"
-          helperText={helperTexts[1]}
-          disabled={isLoading}
-        />
-      </div>
-
-      <LoadingButton
-        variant="contained"
-        type="submit"
-        className={style.submitButton}
-        loading={isLoading}
+    <div className={style.container} ref={containerRef}>
+      <FormControl
+        component="form"
+        onSubmit={onSubmit}
+        required={true}
+        className={style.form}
       >
-        変更
-      </LoadingButton>
-    </FormControl>
+        <div className={style.textFieldsArea}>
+          <TextField
+            className={style.textField}
+            label="新しいパスワードを入力"
+            variant="outlined"
+            margin="dense"
+            value={inputedPassword}
+            onChange={(event: ChangeEvent<HTMLInputElement>) => {
+              setInputedPassword(event.target.value);
+              validateInputs(event.target.value, reinputedPassword);
+            }}
+            type="password"
+            error={!isMatched}
+            helperText={helperTexts[0]}
+            disabled={isLoading}
+          />
+          <TextField
+            className={style.textField}
+            label="パスワードを再入力"
+            variant="outlined"
+            margin="dense"
+            value={reinputedPassword}
+            onChange={(event: ChangeEvent<HTMLInputElement>) => {
+              setReinputedPassword(event.target.value);
+              validateInputs(inputedPassword, event.target.value);
+            }}
+            error={!isMatched}
+            type="password"
+            helperText={helperTexts[1]}
+            disabled={isLoading}
+          />
+        </div>
+
+        <LoadingButton
+          variant="contained"
+          type="submit"
+          className={style.submitButton}
+          loading={isLoading}
+        >
+          変更
+        </LoadingButton>
+      </FormControl>
+    </div>
   );
 };

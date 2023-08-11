@@ -120,20 +120,20 @@ export class AuthClient {
   }
 
   async changePassword(oldPassword: string, newPassword: string) {
-    if (!this._user)
-      return new Promise((resolve, reject) => {
-        this._user!.cognitoUser.changePassword(
-          oldPassword,
-          newPassword,
-          (error, result) => {
-            if (error) {
-              alert(error);
-            } else {
-              console.log(result);
-            }
+    if (!this._user) throw new Error("ユーザー情報を取得できませんでした。");
+    return new Promise<string>((resolve, reject) => {
+      this._user!.cognitoUser.changePassword(
+        oldPassword,
+        newPassword,
+        (error, result) => {
+          if (error) {
+            reject(error);
+          } else {
+            resolve(result!);
           }
-        );
-      });
+        }
+      );
+    });
   }
 }
 

@@ -1,6 +1,11 @@
 import Head from "next/head";
 import type { AppProps } from "next/app";
-import React, { createContext, useEffect } from "react";
+import React, {
+  ReactElement,
+  ReactNode,
+  createContext,
+  useEffect,
+} from "react";
 import { Provider } from "react-redux";
 import { store } from "../src/redux/store";
 import "../src/styles/globals.css";
@@ -11,6 +16,7 @@ import createEmotionCache from "../createEmotionCache";
 import { AuthGuardComponent } from "../src/components/templates/auth/auth";
 import Layout from "../src/components/templates/layout/layout";
 import { WebSocketProvider } from "../src/providers/websocket.provider";
+import { NextPage } from "next";
 
 const clientSideEmotionCache = createEmotionCache();
 
@@ -20,6 +26,10 @@ interface MyAppProps extends AppProps {
     websocketUrl: string;
   };
 }
+
+export type NextPageWithLayout<P = {}, IP = P> = NextPage<P, IP> & {
+  getLayout?: (page: ReactElement) => ReactNode;
+};
 
 function MyApp({
   Component,
